@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include "tm_tools.c"
 
+#define TAPE_PATH "input/tape.txt"
+#define INSTR_PATH "input/instructions.txt"
+
 int main(int argc, char const *argv[])
 {
     char input[BUFSIZ];  // TM tape; DEBUG INPUT
@@ -10,8 +13,8 @@ int main(int argc, char const *argv[])
 
     // ---- loading from file procedure ----
     char c;                                     // char use to read single chars from files
-    FILE *input_file = fopen("input.txt", "r"); // opens read only input.txt and instructions.txt
-    FILE *instructions_file = fopen("instructions.txt", "r");
+    FILE *input_file = fopen(TAPE_PATH, "r"); // opens read only input.txt and instructions.txt
+    FILE *instructions_file = fopen(INSTR_PATH, "r");
 
     if (instructions_file == NULL || input_file == NULL)
     { // checks if input files exist
@@ -42,7 +45,7 @@ int main(int argc, char const *argv[])
 
     char instructions[m.instructions_n][RULES_NUMBER]; // TM instructions matrix
 
-    instructions_file = fopen("instructions.txt", "r");
+    instructions_file = fopen(INSTR_PATH, "r");
 
     for (int i = 0; i < m.instructions_n; i++)
     { // fill instructions matrix
