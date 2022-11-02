@@ -139,22 +139,24 @@ int main(int argc, char const *argv[])
             break;
         }
 
-        case '5':{
+        case '5':
+        {
             print_help();
             break;
         }
 
-        case '6':{
+        case '6':
+        {
             print_about();
             break;
         }
 
-        case '7':{
+        case '7':
+        {
             printf("\nYOU ARE EXITING THE PROGRAM...\n\n");
             check_menu = 0;
             break;
         }
-
         }
     }
 
