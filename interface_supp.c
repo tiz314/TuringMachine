@@ -73,7 +73,7 @@ void print_tape(char tape[])
     printf("\n");
 }
 
-void print_instructions(char instructions[MAX_INSTRUCTIONS][RULES_NUMBER], int instructions_n)
+void print_instructions(char **instructions, int instructions_n)
 {
     int i, j;
     printf("\n=====================\n");
@@ -96,7 +96,7 @@ void print_machine_iteration(char status, int tape_position, char tape[])
     printf("----------------------------------------------------\n");
 }
 
-/* ASCII ART
+/* ASCII ART printed on boot()
 
  /$$$$$$$$                  /$$                           /$$      /$$                     /$$       /$$
 |__  $$__/                 |__/                          | $$$    /$$$                    | $$      |__/

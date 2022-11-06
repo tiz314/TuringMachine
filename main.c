@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "tm_tools.c"
 #include "interface_supp.c"
 
@@ -6,10 +8,10 @@
 
 int main(int argc, char const *argv[])
 {
-    char input[BUFSIZ];                                     // TM tape;
-    __uint8_t check_end = 1, check_menu = 1, loaded = 0, i; // check if END command reached; check for the menu cycle; check for file loading; general purpose counter
-    char user_choice;                                       // user input in the menu
+    __uint8_t check_end, check_menu = 1, loaded = 0, i; // check if END command reached; check for the menu cycle; check for file loading; general purpose counter
+    char user_choice;                                   // user input in the menu
     struct tm_components m;
+    char **instructions; // char pointer for dynamic matrix of instructions
 
     char c;           // char use to read single chars from files
     FILE *input_file; // opens read only input.txt and instructions.txt
@@ -36,9 +38,9 @@ int main(int argc, char const *argv[])
             }
             else
             {
-                m.instructions_n = 0;                // resetting the counter
-                fscanf(input_file, "%[^\n]", input); // reads until breakline is reached
-
+                check_end = 0;                                // check used to control the execution of the program. Initialized here and repeated every time before possible execution
+                m.instructions_n = 0;                         // resetting the counter
+                fscanf(input_file, "%[^\n]", m.input);        // reads until breakline is reached
                 while ((c = fgetc(instructions_file)) != EOF) // Instructions counting
                 {                                             // read character by character and check if the end of the file is reached
                     if (c == '\n')
@@ -51,9 +53,16 @@ int main(int argc, char const *argv[])
                 {
                     m.instructions_n++;                         // counter is increased by 1 since the last '\n' is lost
                     instructions_file = fopen(INSTR_PATH, "r"); // reopening the file (?)
-                    for (int i = 0; i < m.instructions_n; i++)  // filling instructions matrix
+
+                    instructions = (char **)calloc(m.instructions_n, sizeof(char *)); // allocating the char arrays array
+                    for (i = 0; i < m.instructions_n; i++)
                     {
-                        fscanf(instructions_file, "(%c, %c, %c, %c, %c)\n", &m.instructions[i][0], &m.instructions[i][1], &m.instructions[i][2], &m.instructions[i][3], &m.instructions[i][4]);
+                        instructions[i] = (char *)calloc(RULES_NUMBER, sizeof(char)); // allocating the single char array, which is equal to an instruction
+                    }
+
+                    for (int i = 0; i < m.instructions_n; i++) // filling instructions matrix
+                    {
+                        fscanf(instructions_file, "(%c, %c, %c, %c, %c)\n", &instructions[i][0], &instructions[i][1], &instructions[i][2], &instructions[i][3], &instructions[i][4]);
                     }
 
                     printf("\nFILES SUCCESFULLY LOADED\n");
@@ -75,7 +84,7 @@ int main(int argc, char const *argv[])
         {
             if (loaded)
             {
-                print_tape(input);
+                print_tape(m.input);
             }
             else
             {
@@ -88,7 +97,7 @@ int main(int argc, char const *argv[])
         {
             if (loaded)
             {
-                print_instructions(m.instructions, m.instructions_n);
+                print_instructions(instructions, m.instructions_n);
             }
             else
             {
@@ -99,38 +108,46 @@ int main(int argc, char const *argv[])
 
         case '4':
         {
+
             if (loaded)
             {
                 do
                 {
                     m.pos = 0;
                     while (
-                        (m.instructions[m.pos][0] != m.status || m.instructions[m.pos][1] != input[m.tape_position]) &&
+                        (instructions[m.pos][0] != m.status || instructions[m.pos][1] != m.input[m.tape_position]) &&
                         m.pos < m.instructions_n &&
-                        !(m.instructions[m.pos][0] == m.status && m.instructions[m.pos][1] == '-' && (input[m.tape_position] == '\0' || input[m.tape_position] == '*' || input[m.tape_position] == ' '))) // if looking for - on tape but reaching end of char array or space (already there or machine made)
+                        !(instructions[m.pos][0] == m.status && instructions[m.pos][1] == '-' && (m.input[m.tape_position] == '\0' || m.input[m.tape_position] == '*' || m.input[m.tape_position] == ' '))) // if looking for - on tape but reaching end of char array or space (already there or machine made)
                     {
                         m.pos++;
                     }
 
                     if (m.pos < m.instructions_n)
                     {
-                        if (m.instructions[m.pos][2] == 'E')
-                            check_end = 0; // if END reached, unflag check and exit loop
+                        if (instructions[m.pos][2] == 'E')
+                            check_end = 1; // if END reached, unflag check and exit loop
                         else
-                            m.status = m.instructions[m.pos][2];
+                            m.status = instructions[m.pos][2];
 
-                        if (m.instructions[m.pos][3] == '-')
-                            input[m.tape_position] = '*'; // I can understand if it is a machine made space
+                        if (instructions[m.pos][3] == '-')
+                            m.input[m.tape_position] = '*'; // I can understand if it is a machine made space
                         else
-                            input[m.tape_position] = m.instructions[m.pos][3];
+                            m.input[m.tape_position] = instructions[m.pos][3];
 
-                        if (m.instructions[m.pos][4] == '>')
+                        if (instructions[m.pos][4] == '>')
                             m.tape_position++;
-                        else if (m.instructions[m.pos][4] == '<')
+                        else if (instructions[m.pos][4] == '<')
                             m.tape_position--;
                     }
-                    print_machine_iteration(m.instructions[m.pos][0], m.tape_position, input);
-                } while (m.pos < m.instructions_n && check_end);
+                    print_machine_iteration(instructions[m.pos][0], m.tape_position, m.input);
+                } while (m.pos < m.instructions_n && !check_end);
+
+                for (i = 0; i < m.instructions_n; i++) // removing from the heap the dynamically allocated instructions matrix
+                {
+                    free(instructions[i]);
+                }
+                free(instructions);
+                loaded = 0; // unloading instructions and tape
             }
             else
             {
