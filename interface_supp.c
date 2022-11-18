@@ -49,7 +49,7 @@ void print_help()
 void print_about()
 {
     printf("\nA C implementation of a Universal Turing Machine!\n\n-------------------------------------------------------\nFork on GitHub: https://github.com/tiz314/TuringMachine\n-------------------------------------------------------\n");
-    printf("Made by Tiz314, Mighty Gibbon and Staring Linus :|\n\n");
+    printf("Made by Tiziano Radicchi (Tiz314) @2022\n\n");
 }
 
 void print_loading_warning()

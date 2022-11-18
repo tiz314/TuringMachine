@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "tm_tools.c"
@@ -40,7 +41,7 @@ int main(int argc, char const *argv[])
             {
                 check_end = 0;                                // check used to control the execution of the program. Initialized here and repeated every time before possible execution
                 m.instructions_n = 0;                         // resetting the counter
-                fscanf(input_file, "%[^\n]", m.input);        // reads until breakline is reached
+                fscanf(input_file, "%s", m.input);            // reads until breakline is reached
                 while ((c = fgetc(instructions_file)) != EOF) // Instructions counting
                 {                                             // read character by character and check if the end of the file is reached
                     if (c == '\n')
@@ -142,12 +143,12 @@ int main(int argc, char const *argv[])
                     print_machine_iteration(instructions[m.pos][0], m.tape_position, m.input);
                 } while (m.pos < m.instructions_n && !check_end);
 
+                loaded = 0;                            // unloading instructions and tape
                 for (i = 0; i < m.instructions_n; i++) // removing from the heap the dynamically allocated instructions matrix
                 {
                     free(instructions[i]);
                 }
                 free(instructions);
-                loaded = 0; // unloading instructions and tape
             }
             else
             {
@@ -170,6 +171,11 @@ int main(int argc, char const *argv[])
 
         case '7':
         {
+            if (instructions_file)
+                fclose(instructions_file);
+            if (input_file)
+                fclose(input_file); // Cosing files
+
             printf("\nYOU ARE EXITING THE PROGRAM...\n\n");
             check_menu = 0;
             break;
