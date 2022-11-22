@@ -38,7 +38,7 @@ void print_boot()
     printf("                                         |  $$$$$$/                                                                         \n");
     printf("                                          \\______/                                                                          \n");
     printf("==============================================================================================================================\n");
-    sleep(1);
+    // sleep(1);
 }
 
 void print_help()
@@ -57,6 +57,13 @@ void print_loading_warning()
     printf("______________________________________________________________________________________________________________\n");
     printf("WARNING: TAPE AND/OR INSTRUCTIONS FILE CONTAINS ERRORS OR HAS NOT BEEN FOUND! HAVE YOU FORGOTTEN TO LOAD THEM?\n");
     printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
+}
+
+void print_error_during_loading()
+{
+    printf("________________________________________________________________________\n");
+    printf("ERROR: INSTRUCTIONS NOT LOADED CORRECTLY. CHECK THE SYNTAX FOR ANY ERROR\n");
+    printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
 }
 
 void print_tape(char tape[])
@@ -94,6 +101,35 @@ void print_machine_iteration(char status, int tape_position, char tape[])
     printf("STATUS: %c\tTAPE POSITION: %d\n", status, tape_position);
     print_tape(tape);
     printf("----------------------------------------------------\n");
+}
+
+void print_no_instruction_found_alert()
+{
+    printf("_______________________________________\n");
+    printf("WARNING: NO NEW INSTRUCTIONS WERE FOUND\n");
+    printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
+}
+
+void print_warning_no_instructions()
+{
+    printf("________________________________________________\n");
+    printf("WARNING: THE FILE DOES NOT CONTAIN INSTRUCTIONS!\n");
+    printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
+}
+
+void print_success_loading()
+{
+    printf("________________________\n");
+    printf("FILES SUCCESFULLY LOADED\n");
+    printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
+}
+
+void print_exiting()
+{
+    printf("\nYOU ARE EXITING THE PROGRAM...\n\n");
+    printf("______________________________\n");
+    printf("YOU ARE EXITING THE PROGRAM...\n");
+    printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
 }
 
 /* ASCII ART printed on boot()

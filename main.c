@@ -9,8 +9,8 @@
 
 int main(int argc, char const *argv[])
 {
-    __uint8_t check_end, check_menu = 1, loaded = 0, i; // check if END command reached; check for the menu cycle; check for file loading; general purpose counter
-    char user_choice;                                   // user input in the menu
+    __uint8_t check_end, check_menu = 1, loaded = 0, i, j; // check if END command reached; check for the menu cycle; check for file loading; general purpose counters
+    char user_choice[BUFSIZ];                              // user input in the menu
     struct tm_components m;
     char **instructions; // char pointer for dynamic matrix of instructions
 
@@ -23,9 +23,9 @@ int main(int argc, char const *argv[])
     while (check_menu)
     {
         print_menu();
-        scanf("\n%1c", &user_choice);
+        scanf("\n%s", user_choice);
 
-        switch (user_choice)
+        switch (user_choice[0])
         {
 
         case '1':
@@ -39,6 +39,17 @@ int main(int argc, char const *argv[])
             }
             else
             {
+                if (loaded)
+                {
+                    loaded = 0;                            // unloading instructions
+                    for (i = 0; i < m.instructions_n; i++) // removing from the heap the dynamically allocated instructions matrix
+                    {
+                        free(instructions[i]);
+                    }
+                    free(instructions);
+                    init_tape(m.backup_input); // Clearing backup tape from residuals, if any
+                }
+
                 check_end = 0;                                // check used to control the execution of the program. Initialized here and repeated every time before possible execution
                 m.instructions_n = 0;                         // resetting the counter
                 fscanf(input_file, "%s", m.input);            // reads until breakline is reached
@@ -50,10 +61,10 @@ int main(int argc, char const *argv[])
                     }
                 }
 
+                m.instructions_n++; // counter is increased by 1 since the last '\n' is lost. Placed here outside the if in case of just one instruction.
                 if (m.instructions_n > 0)
                 {
-                    m.instructions_n++;                         // counter is increased by 1 since the last '\n' is lost
-                    instructions_file = fopen(INSTR_PATH, "r"); // reopening the file (?)
+                    rewind(instructions_file); // rewinding file for instructions reading
 
                     instructions = (char **)calloc(m.instructions_n, sizeof(char *)); // allocating the char arrays array
                     for (i = 0; i < m.instructions_n; i++)
@@ -61,20 +72,32 @@ int main(int argc, char const *argv[])
                         instructions[i] = (char *)calloc(RULES_NUMBER, sizeof(char)); // allocating the single char array, which is equal to an instruction
                     }
 
-                    for (int i = 0; i < m.instructions_n; i++) // filling instructions matrix
+                    j = 1;                                          // Using GP counter j for checking the pattern response from file content
+                    for (int i = 0; i < m.instructions_n && j; i++) // filling instructions matrix
                     {
-                        fscanf(instructions_file, "(%c, %c, %c, %c, %c)\n", &instructions[i][0], &instructions[i][1], &instructions[i][2], &instructions[i][3], &instructions[i][4]);
+                        if (fscanf(instructions_file, "(%c, %c, %c, %c, %c)\n", &instructions[i][0], &instructions[i][1], &instructions[i][2], &instructions[i][3], &instructions[i][4]) != 5)
+                        {
+                            j = 0;
+                        }
                     }
 
-                    printf("\nFILES SUCCESFULLY LOADED\n");
-                    // initializing struct variables
-                    m.status = '0';
-                    m.tape_position = 0;
-                    loaded = 1; // setting file check for other operations
+                    if (j)
+                    {
+                        print_success_loading();
+                        // initializing struct variables
+                        m.status = '0';
+                        m.tape_position = 0;
+                        loaded = 1;                         // setting file check for other operations
+                        copy_tape(m.input, m.backup_input); // backup of the tape
+                    }
+                    else
+                    {
+                        print_error_during_loading();
+                    }
                 }
                 else
                 {
-                    printf("\nTHE FILE DOES NOT CONTAIN INSTRUCTIONS!\n");
+                    print_warning_no_instructions();
                     loaded = 0;
                 }
             }
@@ -109,16 +132,17 @@ int main(int argc, char const *argv[])
 
         case '4':
         {
-
             if (loaded)
             {
+                m.pos = 0;                                                                 // Necessary for any outdated value from previous executions. If tape changes in size, then segfault would occur
+                print_machine_iteration(instructions[m.pos][0], m.tape_position, m.input); // First tape print. Useful if any instruction won't be chosen
                 do
                 {
                     m.pos = 0;
                     while (
+                        (m.pos < m.instructions_n) &&
                         (instructions[m.pos][0] != m.status || instructions[m.pos][1] != m.input[m.tape_position]) &&
-                        m.pos < m.instructions_n &&
-                        !(instructions[m.pos][0] == m.status && instructions[m.pos][1] == '-' && (m.input[m.tape_position] == '\0' || m.input[m.tape_position] == '*' || m.input[m.tape_position] == ' '))) // if looking for - on tape but reaching end of char array or space (already there or machine made)
+                        !(instructions[m.pos][0] == m.status && instructions[m.pos][1] == '-' && (m.input[m.tape_position] == '\0' || m.input[m.tape_position] == '*' || m.input[m.tape_position] == ' '))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
                     {
                         m.pos++;
                     }
@@ -139,16 +163,20 @@ int main(int argc, char const *argv[])
                             m.tape_position++;
                         else if (instructions[m.pos][4] == '<')
                             m.tape_position--;
+
+                        print_machine_iteration(instructions[m.pos][0], m.tape_position, m.input);
                     }
-                    print_machine_iteration(instructions[m.pos][0], m.tape_position, m.input);
                 } while (m.pos < m.instructions_n && !check_end);
 
-                loaded = 0;                            // unloading instructions and tape
-                for (i = 0; i < m.instructions_n; i++) // removing from the heap the dynamically allocated instructions matrix
+                if (m.pos == m.instructions_n)
                 {
-                    free(instructions[i]);
+                    print_no_instruction_found_alert();
                 }
-                free(instructions);
+
+                check_end = 0;                      // Restoring check end
+                m.status = '0';                     // Restoring machine status
+                m.tape_position = 0;                // Restoring tape position
+                copy_tape(m.backup_input, m.input); // restoring the tape
             }
             else
             {
@@ -176,7 +204,7 @@ int main(int argc, char const *argv[])
             if (input_file)
                 fclose(input_file); // Cosing files
 
-            printf("\nYOU ARE EXITING THE PROGRAM...\n\n");
+            print_exiting();
             check_menu = 0;
             break;
         }
