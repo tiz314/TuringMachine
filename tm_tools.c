@@ -8,7 +8,7 @@ typedef uint8_t __uint8_t
 #define MAX_INSTRUCTIONS 100
 #define RULES_NUMBER 5
 
-// | STATUS | INPUT | NEXT STATUS | OUTPUT | MOVEMENT | <-- Instructions scheme
+// | STATUS | INPUT | NEXT STATUS | OUTPUT | MOVEMENT | <-- Instructions schema
 struct tm_components
 {
     char status;                       // current machine status, starts from 0
@@ -19,14 +19,14 @@ struct tm_components
     char backup_input[BUFSIZ];         // backup char array. The original tape is copied also here, in order to recover it without realoding from file.
 };
 
-void init_tape(char *tape){
+void init_tape(char *tape)
+{
     int i;
     for (i = 0; tape[i] != '\0'; i++)
     {
         tape[i] = ' ';
     }
 }
-
 
 void copy_tape(char *orig, char *dest)
 { // used for backupping the tape and restoring it

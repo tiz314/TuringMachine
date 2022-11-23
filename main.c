@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "tm_tools.c"
 #include "interface_supp.c"
@@ -10,7 +11,7 @@
 int main(int argc, char const *argv[])
 {
     __uint8_t check_end, check_menu = 1, loaded = 0, i, j; // check if END command reached; check for the menu cycle; check for file loading; general purpose counters
-    char user_choice[BUFSIZ];                              // user input in the menu
+    char user_choice[BUFSIZ];                              // user input in the menu. pre-defined size because of the possibility to enter string commands
     struct tm_components m;
     char **instructions; // char pointer for dynamic matrix of instructions
 
@@ -22,13 +23,17 @@ int main(int argc, char const *argv[])
 
     while (check_menu)
     {
-        print_menu();
-        scanf("\n%s", user_choice);
+        printf("\n~$ > ");
 
-        switch (user_choice[0])
+        fgets(user_choice, BUFSIZ, stdin);
+        user_choice[strlen(user_choice) - 1] = '\0'; // receveing user input and removing \n for strcmp
+
+        for (int i = 0; user_choice[i]; i++)
         {
+            user_choice[i] = toupper(user_choice[i]); // uppering the input
+        }
 
-        case '1':
+        if (!strcmp(user_choice, "LOAD"))
         {
             input_file = fopen(TAPE_PATH, "r");
             instructions_file = fopen(INSTR_PATH, "r");
@@ -101,10 +106,8 @@ int main(int argc, char const *argv[])
                     loaded = 0;
                 }
             }
-            break;
         }
-
-        case '2':
+        else if (!strcmp(user_choice, "PRINT TAPE"))
         {
             if (loaded)
             {
@@ -114,10 +117,8 @@ int main(int argc, char const *argv[])
             {
                 print_loading_warning();
             }
-            break;
         }
-
-        case '3':
+        else if (!strcmp(user_choice, "PRINT INSTRS"))
         {
             if (loaded)
             {
@@ -127,10 +128,8 @@ int main(int argc, char const *argv[])
             {
                 print_loading_warning();
             }
-            break;
         }
-
-        case '4':
+        else if (!strcmp(user_choice, "RUN"))
         {
             if (loaded)
             {
@@ -182,22 +181,27 @@ int main(int argc, char const *argv[])
             {
                 print_loading_warning();
             }
-            break;
         }
-
-        case '5':
+        else if (!strcmp(user_choice, "HELP"))
         {
             print_help();
-            break;
         }
-
-        case '6':
+        else if (!strcmp(user_choice, "ABOUT"))
         {
             print_about();
-            break;
         }
-
-        case '7':
+        else if (!strcmp(user_choice, "CLEAR"))
+        {
+            clear_screen();
+        }
+        else if(!strcmp(user_choice, "SETTINGS")){
+            print_settings();
+            scanf("\n%s", user_choice);
+            if(user_choice[0] == '1'){
+                print_changing_tm_mode();
+            }// TODO: complete implementation for two tapes machine
+        }
+        else if (!strcmp(user_choice, "EXIT"))
         {
             if (instructions_file)
                 fclose(instructions_file);
@@ -206,8 +210,10 @@ int main(int argc, char const *argv[])
 
             print_exiting();
             check_menu = 0;
-            break;
         }
+        else
+        {
+            print_command_not_found();
         }
     }
 

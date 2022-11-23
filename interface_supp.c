@@ -6,6 +6,8 @@
 #include <windows.h>
 #endif
 
+#define WAIT_TIME 10000
+
 void clear_screen()
 {
 #ifdef __linux__
@@ -15,11 +17,6 @@ void clear_screen()
 #else
     clrscr();
 #endif
-}
-
-void print_menu()
-{
-    printf("\nSELECT AN OPTION: \n\n1- LOAD FILES\n2- PRINT TAPE\n3- PRINT INSTRUCTIONS\n4- EXECUTE\n5- HELP\n6- ABOUT\n7- SHUTDOWN\n\n> ");
 }
 
 void print_boot()
@@ -38,18 +35,29 @@ void print_boot()
     printf("                                         |  $$$$$$/                                                                         \n");
     printf("                                          \\______/                                                                          \n");
     printf("==============================================================================================================================\n");
-    // sleep(1);
+    usleep(WAIT_TIME * 100);
 }
 
 void print_help()
 {
     printf("\nPlease specify the input tape and the instruction by using the input files in the input folder. \nYou can specify and empty character on the tape using '-', while the END command using 'E'. Enjoy!\n\n");
+    printf("------------\nLIST OF COMMANDS:\n");
+    printf("LOAD: Load tape and instructions from file\nPRINT [CONTENT]: Print loaded data. Arguments can be TAPE or INSTRS (instructions)\n");
+    printf("RUN: Execute the program\nHELP: Get this message\nABOUT: Something about this program\nCLEAR: Clear the screen from previous outputs\nSETTINGS: Open settings dialog\nEXIT: Exit the program\n-----------\nCommands and case-insensitive\n");
 }
 
 void print_about()
 {
     printf("\nA C implementation of a Universal Turing Machine!\n\n-------------------------------------------------------\nFork on GitHub: https://github.com/tiz314/TuringMachine\n-------------------------------------------------------\n");
     printf("Made by Tiziano Radicchi (Tiz314) @2022\n\n");
+}
+
+void print_settings(){
+    printf("\n1• Change TM mode\n2• Exit settings\n");
+}
+
+void print_changing_tm_mode(){
+    printf("One tape (1)\nTwo tapes (2)\n");
 }
 
 void print_loading_warning()
@@ -64,6 +72,13 @@ void print_error_during_loading()
     printf("________________________________________________________________________\n");
     printf("ERROR: INSTRUCTIONS NOT LOADED CORRECTLY. CHECK THE SYNTAX FOR ANY ERROR\n");
     printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
+}
+
+void print_command_not_found()
+{
+    printf("____________________________________________________________\n");
+    printf("ERROR: COMMAND NOT FOUND. TYPE \"HELP\" FOR A LIST OF COMMANDS\n");
+    printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
 }
 
 void print_tape(char tape[])
@@ -126,7 +141,6 @@ void print_success_loading()
 
 void print_exiting()
 {
-    printf("\nYOU ARE EXITING THE PROGRAM...\n\n");
     printf("______________________________\n");
     printf("YOU ARE EXITING THE PROGRAM...\n");
     printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
