@@ -30,4 +30,4 @@ By now, the implementation doesn't accept status called by names, but only repre
 
 ## Credits
 
-Thanks to [Mighty Gibbon](https://github.com/alberto-mg) for the file management and Staring Linus :| for the great idea!
+Thanks to [Mighty Gibbon](https://github.com/alberto-mg) for the first version of the file management and Staring Linus :| for the great idea!
