@@ -7,6 +7,7 @@
 #endif
 
 #define WAIT_TIME 10000
+#define PROMPT "\n~$ > "
 
 void clear_screen()
 {
@@ -38,11 +39,25 @@ void print_boot()
     usleep(WAIT_TIME * 100);
 }
 
+/*void print_config_error()
+{
+    printf("______________________________________________________________________________________\n");
+    printf("WARNING: ERRORS IN THE CONFIG FILE HAVE BEEN FOUND. THE MACHINE IS SET TO DEFAULT SETTINGS\n");
+    printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
+}
+
+void print_config_loading_error()
+{
+    printf("______________________________________________________________________________\n");
+    printf("ERROR: THE CONFIG FILE CONTAINS ERRORS. THE MACHINE IS SET TO DEFAULT SETTINGS\n");
+    printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
+}*/
+
 void print_help()
 {
     printf("\nPlease specify the input tape and the instruction by using the input files in the input folder. \nYou can specify and empty character on the tape using '-', while the END command using 'E'. Enjoy!\n\n");
     printf("------------\nLIST OF COMMANDS:\n");
-    printf("LOAD: Load tape and instructions from file\nPRINT [CONTENT]: Print loaded data. Arguments can be TAPE or INSTRS (instructions)\n");
+    printf("LOAD: Load tape and instructions from file\nPRINT [CONTENT]: Print loaded data. Arguments can be TAPE or INST (instructions)\n");
     printf("RUN: Execute the program\nHELP: Get this message\nABOUT: Something about this program\nCLEAR: Clear the screen from previous outputs\nSETTINGS: Open settings dialog\nEXIT: Exit the program\n-----------\nCommands and case-insensitive\n");
 }
 
@@ -52,12 +67,20 @@ void print_about()
     printf("Made by Tiziano Radicchi (Tiz314) @2022\n\n");
 }
 
-void print_settings(){
-    printf("\n1• Change TM mode\n2• Exit settings\n");
+void print_settings()
+{
+    printf("\n1- Change TM mode\n2- Exit settings\n");
 }
 
-void print_changing_tm_mode(){
-    printf("One tape (1)\nTwo tapes (2)\n");
+void print_changing_tm_mode()
+{
+    printf("One tape (0)\nTwo tapes (1)\n");
+}
+
+void print_mode_change_success(char *input){
+    printf("________________________________________\n");
+    printf("MODE SUCCESFULLY SET TO %s TAPE MODE\n", input);
+    printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
 }
 
 void print_loading_warning()

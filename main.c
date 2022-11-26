@@ -12,19 +12,38 @@ int main(int argc, char const *argv[])
 {
     __uint8_t check_end, check_menu = 1, loaded = 0, i, j; // check if END command reached; check for the menu cycle; check for file loading; general purpose counters
     char user_choice[BUFSIZ];                              // user input in the menu. pre-defined size because of the possibility to enter string commands
-    struct tm_components m;
+    tm_components m;
     char **instructions; // char pointer for dynamic matrix of instructions
+    char *second_tape;   // Eventually used char pointer for the second tape
 
     char c;           // char use to read single chars from files
     FILE *input_file; // opens read only input.txt and instructions.txt
     FILE *instructions_file;
+    // FILE *config_file = fopen("./settings.conf", "rw"); // Config file, contains information about the configuration of the machine
+
+    m.m_mode = 0; // Setting as default the single tape mode
 
     print_boot();
 
+    /*if (config_file == NULL) // config file loading process, handling possible errors
+    {
+        print_config_error();
+        //set_default_settings(&m);
+    }
+    else
+    {
+        if (load_settings(config_file, &m) == -1)
+        {
+            print_config_loading_error();
+          //  set_default_settings(&m);
+        }
+    }*/
+
     while (check_menu)
     {
-        printf("\n~$ > ");
+        printf(PROMPT);
 
+        scanf("\n"); // Removing from buffer any residuals from previous input. Necessary for settings dialog inputs
         fgets(user_choice, BUFSIZ, stdin);
         user_choice[strlen(user_choice) - 1] = '\0'; // receveing user input and removing \n for strcmp
 
@@ -118,8 +137,9 @@ int main(int argc, char const *argv[])
                 print_loading_warning();
             }
         }
-        else if (!strcmp(user_choice, "PRINT INSTRS"))
+        else if (!strcmp(user_choice, "PRINT INST"))
         {
+
             if (loaded)
             {
                 print_instructions(instructions, m.instructions_n);
@@ -194,12 +214,39 @@ int main(int argc, char const *argv[])
         {
             clear_screen();
         }
-        else if(!strcmp(user_choice, "SETTINGS")){
+        else if (!strcmp(user_choice, "SETTINGS"))
+        {
             print_settings();
+            printf(PROMPT);
             scanf("\n%s", user_choice);
-            if(user_choice[0] == '1'){
+            if (user_choice[0] == '1')
+            {
                 print_changing_tm_mode();
-            }// TODO: complete implementation for two tapes machine
+                printf(PROMPT);
+                scanf("\n%s", user_choice);
+
+                if (user_choice[0] == '0') // switching between modes of operation (single tape of two tapes)
+                {
+                    m.m_mode = 0;
+                    print_mode_change_success("SINGLE");
+                    if (second_tape != NULL)
+                    {
+                        free(second_tape); // freeing space allocated for the second tape
+                    }
+                }
+                else if (user_choice[0] == '1')
+                {
+                    m.m_mode = 1;
+                    print_mode_change_success("TWO");
+                    second_tape = (char *)calloc(sizeof(char), BUFSIZ); // Allocating for the second tape the same size of the primary tape. BUFSIZ is chosen because the evolution of the tape caused by the program in unknown
+                }
+                else
+                    printf("Invalid option\n");
+            }
+            else
+            {
+                printf("\nExiting settings...\n");
+            }
         }
         else if (!strcmp(user_choice, "EXIT"))
         {
