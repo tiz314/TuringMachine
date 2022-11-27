@@ -5,7 +5,7 @@
 
 ## What is it?
 
-This is a simple C project that was born as an exercise for the CS class. It replicates the behaviour of a [Universal Turing Machine](https://en.wikipedia.org/wiki/Universal_Turing_machine)
+This is a simple C project that was born as an exercise for my CS class. It replicates the behaviour of a [Universal Turing Machine](https://en.wikipedia.org/wiki/Universal_Turing_machine)
 
 
 ## How to use
