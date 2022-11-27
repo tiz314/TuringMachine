@@ -1,13 +1,4 @@
-#include <stdio.h>
-
-#ifdef __linux__ // including libraries for sleep, based on platform on which you compile
-#include <unistd.h>
-#else
-#include <windows.h>
-#endif
-
-#define WAIT_TIME 10000
-#define PROMPT "\n~$ > "
+#include "consts.h"
 
 void clear_screen()
 {

@@ -1,12 +1,5 @@
+#include "consts.h"
 #include <string.h>
-#include <stdio.h>
-
-#ifndef __linux__ // defining name for __uint8_t for windows platform
-typedef uint8_t __uint8_t
-#endif
-
-#define MAX_INSTRUCTIONS 100
-#define RULES_NUMBER 5
 
     /*
     The instruction schema used for instructions depends on the two main modes of operation of the machine: one or two tapes:

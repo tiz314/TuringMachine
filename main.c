@@ -1,12 +1,9 @@
-#include <stdio.h>
+#include "consts.h"
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "tm_tools.c"
-#include "interface_supp.c"
-
-#define TAPE_PATH "input/tape.txt"
-#define INSTR_PATH "input/instructions.txt"
+#include "tm_tools.h"
+#include "cli_interface.h"
 
 int main(int argc, char const *argv[])
 {
