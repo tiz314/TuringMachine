@@ -65,10 +65,11 @@ void print_settings()
 
 void print_changing_tm_mode()
 {
-    printf("One tape (0)\nTwo tapes (1)\n");
+    printf("One tape (1)\nTwo tapes (2)\n");
 }
 
-void print_mode_change_success(char *input){
+void print_mode_change_success(char *input)
+{
     printf("________________________________________\n");
     printf("MODE SUCCESFULLY SET TO %s TAPE MODE\n", input);
     printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
@@ -98,10 +99,12 @@ void print_command_not_found()
 void print_tape(char tape[])
 {
     int i, tape_dim = strlen(tape);
+    if (tape_dim < TAPE_DIM / 2)
+        tape_dim = TAPE_DIM / 2; // Just a UI preference. If the length of the tape (based on the content) is smaller than the half of the total tape size, print half of the tape
     printf("\n|  ");
     for (i = 0; i < tape_dim; i++)
     {
-        if (tape[i] == '*')
+        if (tape[i] == '*' || tape[i] == '\0')
             printf("   |  ");
         else
             printf("%c  |  ", tape[i]);
@@ -109,19 +112,26 @@ void print_tape(char tape[])
     printf("\n");
 }
 
-void print_instructions(char **instructions, int instructions_n)
+void print_instructions(char **instructions, int instructions_n, int mode)
 {
-    int i, j;
-    printf("\n=====================\n");
-    for (i = 0; i < instructions_n; i++)
-    {
-        for (j = 0; j < RULES_NUMBER; j++)
+    int i, j, size = mode ? TWO_TAPES_RULES_NUMBER : SINGLE_TAPE_RULES_NUMBER;
+    printf("\n=====================");
+    if (mode)
+        printf("============");
+    printf("\n");
+    if (mode)
+        for (i = 0; i < instructions_n; i++)
         {
-            printf("| %c ", instructions[i][j]);
+            for (j = 0; j < size; j++)
+            {
+                printf("| %c ", instructions[i][j]);
+            }
+            printf("|\n");
         }
-        printf("|\n");
-    }
-    printf("=====================\n");
+    printf("=====================");
+    if (mode)
+        printf("============");
+    printf("\n");
 }
 
 void print_machine_iteration(char status, int tape_position, char tape[])

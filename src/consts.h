@@ -3,12 +3,12 @@
 #define WAIT_TIME 10000
 #define PROMPT "\n~$ > "
 
-#define MAX_INSTRUCTIONS 100
-#define RULES_NUMBER 5
+#define TAPE_DIM 50
+#define SINGLE_TAPE_RULES_NUMBER 5
+#define TWO_TAPES_RULES_NUMBER 8
 
-#define TAPE_PATH "input/tape.txt"
-#define INSTR_PATH "input/instructions.txt"
-
+#define TAPE_PATH "../input/tape.txt"
+#define INSTR_PATH "../input/instructions.txt"
 
 #ifdef __linux__ // including libraries for sleep, based on platform on which you compile
 #include <unistd.h>
