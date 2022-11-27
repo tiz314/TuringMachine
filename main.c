@@ -97,7 +97,7 @@ int main(int argc, char const *argv[])
                     }
 
                     j = 1;                                          // Using GP counter j for checking the pattern response from file content
-                    for (int i = 0; i < m.instructions_n && j; i++) // filling instructions matrix
+                    for (i = 0; i < m.instructions_n && j; i++) // filling instructions matrix
                     {
                         if (fscanf(instructions_file, "(%c, %c, %c, %c, %c)\n", &instructions[i][0], &instructions[i][1], &instructions[i][2], &instructions[i][3], &instructions[i][4]) != 5)
                         {
