@@ -232,39 +232,52 @@ int main(int argc, char const *argv[])
                         }
                     } while (pos < instructions_n && !check_end);
                 }
-                else if (m_mode == 1)
-                { // Else if two tapes (not else, maybe more tapes in the future), use this algorithm, which includes the additional tape. Another algorithm is required, since even the structure of instructions differs.
-                    // TODO
-                    do
+                else
+                {                                    // Else two tapes (by now, m_mode strictly set to 0 or 1), use this algorithm, which includes the additional tape. Another algorithm is required, since even the structure of instructions differs.
+                    init_tape(second_tape->content); // restoring the tape for another execution
+                    print_machine_iteration(instructions[pos][0], second_tape->pos, second_tape->content);
+                    do // TODO: debug
                     {
                         pos = 0;
                         while (
                             (pos < instructions_n) &&
                             (main_tape.pos < TAPE_DIM) &&
                             (instructions[pos][0] != status || instructions[pos][1] != main_tape.content[main_tape.pos] || instructions[pos][2] != second_tape->content[second_tape->pos]) &&
-                            !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape.content[main_tape.pos] == '\0' || main_tape.content[main_tape.pos] == '*' || main_tape.content[main_tape.pos] == ' '))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
+                            !((instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape.content[main_tape.pos] == '\0' || main_tape.content[main_tape.pos] == '*' || main_tape.content[main_tape.pos] == ' ')) ||
+                              (instructions[pos][0] == status && instructions[pos][2] == '-' && (second_tape->content[second_tape->pos] == '\0' || second_tape->content[second_tape->pos] == '*' || second_tape->content[second_tape->pos] == ' ')))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
                         {
                             pos++;
                         }
 
-                        if (pos < instructions_n && main_tape.pos < TAPE_DIM)
+                        if (pos < instructions_n && main_tape.pos < TAPE_DIM && second_tape->pos < TAPE_DIM)
                         {
-                            if (instructions[pos][2] == 'E')
+                            if (instructions[pos][3] == 'E')
                                 check_end = 1; // if END reached, unflag check and exit loop
                             else
-                                status = instructions[pos][2];
+                                status = instructions[pos][3];
 
-                            if (instructions[pos][3] == '-')
+                            if (instructions[pos][4] == '-')
                                 main_tape.content[main_tape.pos] = '*'; // I can understand if it is a machine made space
                             else
-                                main_tape.content[main_tape.pos] = instructions[pos][3];
+                                main_tape.content[main_tape.pos] = instructions[pos][4];
 
-                            if (instructions[pos][4] == '>')
+                            if (instructions[pos][5] == '-')
+                                second_tape->content[second_tape->pos] = '*'; // I can understand if it is a machine made space
+                            else
+                                second_tape->content[second_tape->pos] = instructions[pos][5];
+
+                            if (instructions[pos][6] == '>')
                                 main_tape.pos++;
-                            else if (instructions[pos][4] == '<')
+                            else if (instructions[pos][6] == '<')
                                 main_tape.pos--;
 
+                            if (instructions[pos][7] == '>')
+                                second_tape->pos++;
+                            else if (instructions[pos][7] == '<')
+                                second_tape->pos--;
+
                             print_machine_iteration(instructions[pos][0], main_tape.pos, main_tape.content);
+                            print_machine_iteration(instructions[pos][0], second_tape->pos, second_tape->content);
                         }
                         else
                         {

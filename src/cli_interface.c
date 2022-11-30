@@ -138,10 +138,10 @@ void print_instructions(char **instructions, int instructions_n, int mode)
 
 void print_machine_iteration(char status, int tape_position, char tape[])
 {
-    printf("----------------------------------------------------\n");
+    printf("------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
     printf("STATUS: %c\tTAPE POSITION: %d\n", status, tape_position);
     print_tape(tape);
-    printf("----------------------------------------------------\n");
+    printf("------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
 }
 
 void print_no_instruction_found_alert()
