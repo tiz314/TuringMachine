@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #define WAIT_TIME 10000
 #define PROMPT "\n~$ > "
 
@@ -16,6 +14,6 @@
 #include <windows.h>
 #endif
 
-#ifndef __linux__ // defining name for __uint8_t for windows platform
+#ifndef __linux__ // renaming __uint8_t for windows platform
 typedef uint8_t __uint8_t
 #endif

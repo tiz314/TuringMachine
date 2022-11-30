@@ -1,4 +1,7 @@
-#include "consts.h"
+#include <stdio.h>
+#include <string.h>
+
+#include "./headers/consts.h"
 
 void clear_screen()
 {
@@ -119,15 +122,14 @@ void print_instructions(char **instructions, int instructions_n, int mode)
     if (mode)
         printf("============");
     printf("\n");
-    if (mode)
-        for (i = 0; i < instructions_n; i++)
+    for (i = 0; i < instructions_n; i++)
+    {
+        for (j = 0; j < size; j++)
         {
-            for (j = 0; j < size; j++)
-            {
-                printf("| %c ", instructions[i][j]);
-            }
-            printf("|\n");
+            printf("| %c ", instructions[i][j]);
         }
+        printf("|\n");
+    }
     printf("=====================");
     if (mode)
         printf("============");
