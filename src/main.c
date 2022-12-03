@@ -233,8 +233,8 @@ int main(int argc, char const *argv[])
                     } while (pos < instructions_n && !check_end);
                 }
                 else
-                {                                    // Else two tapes (by now, m_mode strictly set to 0 or 1), use this algorithm, which includes the additional tape. Another algorithm is required, since even the structure of instructions differs.
-                    /*init_tape(second_tape->content); // restoring the tape for another execution
+                { // Else two tapes (by now, m_mode strictly set to 0 or 1), use this algorithm, which includes the additional tape. Another algorithm is required, since even the structure of instructions differs.
+                    init_tape(second_tape->content); // restoring the tape for another execution
                     print_machine_iteration(instructions[pos][0], second_tape->pos, second_tape->content);
                     do // TODO: debug
                     {
@@ -259,12 +259,12 @@ int main(int argc, char const *argv[])
                             if (instructions[pos][4] == '-')
                                 main_tape.content[main_tape.pos] = '*'; // I can understand if it is a machine made space
                             else
-                                main_tape.content[main_tape.pos] = instructions[pos][4];
+                                main_tape.content[main_tape.pos] = instructions[pos][5];
 
                             if (instructions[pos][5] == '-')
                                 second_tape->content[second_tape->pos] = '*'; // I can understand if it is a machine made space
                             else
-                                second_tape->content[second_tape->pos] = instructions[pos][5];
+                                second_tape->content[second_tape->pos] = instructions[pos][6];
 
                             if (instructions[pos][6] == '>')
                                 main_tape.pos++;
@@ -284,7 +284,7 @@ int main(int argc, char const *argv[])
                         {
                             check_end = 1; // Tape end reached or no instructions to execute
                         }
-                    } while (pos < instructions_n && !check_end);*/
+                    } while (pos < instructions_n && !check_end);
                 }
 
                 if (pos == instructions_n)
@@ -296,7 +296,8 @@ int main(int argc, char const *argv[])
                 check_end = 0;     // Restoring check end
                 status = '0';      // Restoring machine status
                 main_tape.pos = 0; // Restoring tape position
-                if(m_mode == 1) second_tape->pos = 0;
+                if (m_mode == 1)
+                    second_tape->pos = 0;
                 copy_tape(backup_tape, main_tape.content); // restoring the tape
             }
             else

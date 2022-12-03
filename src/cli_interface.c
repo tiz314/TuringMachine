@@ -102,13 +102,20 @@ void print_command_not_found()
 void print_tape(char tape[])
 {
     int i, tape_dim = strlen(tape);
-    printf("\n|  ");
-    for (i = 0; i < tape_dim; i++)
+    if (tape_dim)
     {
-        if (tape[i] == '*' || tape[i] == '\0')
-            printf("   |  ");
-        else
-            printf("%c  |  ", tape[i]);
+        printf("\n|  ");
+        for (i = 0; i < tape_dim; i++)
+        {
+            if (tape[i] == '*' || tape[i] == '\0')
+                printf("   |  ");
+            else
+                printf("%c  |  ", tape[i]);
+        }
+    }
+    else
+    {
+        printf("\nTape is empty");
     }
     printf("\n");
 }
