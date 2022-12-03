@@ -1,7 +1,7 @@
 #define WAIT_TIME 10000
 #define PROMPT "\n~$ > "
 
-#define TAPE_DIM 50
+#define TAPE_DIM 100
 #define SINGLE_TAPE_RULES_NUMBER 5
 #define TWO_TAPES_RULES_NUMBER 8
 

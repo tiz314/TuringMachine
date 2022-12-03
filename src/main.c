@@ -234,20 +234,20 @@ int main(int argc, char const *argv[])
                 }
                 else
                 {                                    // Else two tapes (by now, m_mode strictly set to 0 or 1), use this algorithm, which includes the additional tape. Another algorithm is required, since even the structure of instructions differs.
-                    init_tape(second_tape->content); // restoring the tape for another execution
+                    /*init_tape(second_tape->content); // restoring the tape for another execution
                     print_machine_iteration(instructions[pos][0], second_tape->pos, second_tape->content);
                     do // TODO: debug
                     {
                         pos = 0;
                         while (
                             (pos < instructions_n) &&
-                            (main_tape.pos < TAPE_DIM) &&
+                            (main_tape.pos < TAPE_DIM) && (second_tape->pos < TAPE_DIM) &&
                             (instructions[pos][0] != status || instructions[pos][1] != main_tape.content[main_tape.pos] || instructions[pos][2] != second_tape->content[second_tape->pos]) &&
-                            !((instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape.content[main_tape.pos] == '\0' || main_tape.content[main_tape.pos] == '*' || main_tape.content[main_tape.pos] == ' ')) ||
-                              (instructions[pos][0] == status && instructions[pos][2] == '-' && (second_tape->content[second_tape->pos] == '\0' || second_tape->content[second_tape->pos] == '*' || second_tape->content[second_tape->pos] == ' ')))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
-                        {
-                            pos++;
-                        }
+                            !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape.content[main_tape.pos] == '\0' || main_tape.content[main_tape.pos] == '*' || main_tape.content[main_tape.pos] == ' ')) &&
+                            !(instructions[pos][0] == status && instructions[pos][2] == '-' && (second_tape->content[second_tape->pos] == '\0' || second_tape->content[second_tape->pos] == '*' || second_tape->content[second_tape->pos] == ' '))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
+                            {
+                                pos++;
+                            }
 
                         if (pos < instructions_n && main_tape.pos < TAPE_DIM && second_tape->pos < TAPE_DIM)
                         {
@@ -278,12 +278,13 @@ int main(int argc, char const *argv[])
 
                             print_machine_iteration(instructions[pos][0], main_tape.pos, main_tape.content);
                             print_machine_iteration(instructions[pos][0], second_tape->pos, second_tape->content);
+                            printf("\n\n");
                         }
                         else
                         {
                             check_end = 1; // Tape end reached or no instructions to execute
                         }
-                    } while (pos < instructions_n && !check_end);
+                    } while (pos < instructions_n && !check_end);*/
                 }
 
                 if (pos == instructions_n)
@@ -291,10 +292,11 @@ int main(int argc, char const *argv[])
                     print_no_instruction_found_alert();
                 }
 
-                pos = 0;                                   // Restoring pos. Necessary for any outdated value from previous executions. If tape changes in size, then segfault would occur
-                check_end = 0;                             // Restoring check end
-                status = '0';                              // Restoring machine status
-                main_tape.pos = 0;                         // Restoring tape position
+                pos = 0;           // Restoring pos. Necessary for any outdated value from previous executions. If tape changes in size, then segfault would occur
+                check_end = 0;     // Restoring check end
+                status = '0';      // Restoring machine status
+                main_tape.pos = 0; // Restoring tape position
+                if(m_mode == 1) second_tape->pos = 0;
                 copy_tape(backup_tape, main_tape.content); // restoring the tape
             }
             else

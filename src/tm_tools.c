@@ -12,7 +12,7 @@ void init_tape(char *tape)
 {
     for (int i = 0; i < TAPE_DIM; i++)
     {
-        tape[i] = ' ';
+        tape[i] = 0;
     }
 }
 

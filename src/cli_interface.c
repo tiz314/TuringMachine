@@ -102,8 +102,6 @@ void print_command_not_found()
 void print_tape(char tape[])
 {
     int i, tape_dim = strlen(tape);
-    if (tape_dim < TAPE_DIM / 2)
-        tape_dim = TAPE_DIM / 2; // Just a UI preference. If the length of the tape (based on the content) is smaller than the half of the total tape size, print half of the tape
     printf("\n|  ");
     for (i = 0; i < tape_dim; i++)
     {
