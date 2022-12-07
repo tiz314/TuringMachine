@@ -20,11 +20,12 @@ int main(int argc, char const *argv[])
 
     char **instructions; // char pointer for dynamic matrix of instructions
 
-    tape main_tape;             // TM main tape. Not dinamically allocated because of the possibility to write new slots by the program itself
-    char backup_tape[TAPE_DIM]; // backup char array. The original tape is copied also here, in order to recover it without realoding from file. Out of the struct because not always necessary, but only for the main tape
+    cell *main_tape_cell_temp; // used as temporary variable for prev pointer while adding an element
+    cell *main_tape_cell = (cell *)calloc(1, sizeof(cell));
+    cell *main_tape_backup = (cell *)calloc(1, sizeof(cell));
 
     // ** ONLY FOR TWO TAPES MODE, IF ENABLED **
-    tape *second_tape; // Eventually used pointer to tape struct, containing a char array and an int used as position counter
+    cell *second_tape_cell; // Eventually used pointer to tape struct, containing a char array and an int used as position counter
     // **
 
     char c;           // char use to read single chars from files
@@ -35,6 +36,10 @@ int main(int argc, char const *argv[])
     m_mode = 0; // Setting the single tape mode as default
 
     print_boot();
+
+    // printf("%p, %p, %p\n", main_tape_cell->prev, main_tape_cell, main_tape_cell->next);
+
+    // printf("%p", get_first_element(main_tape_cell));
 
     /*if (config_file == NULL) // config file loading process, handling possible errors
     {
@@ -74,6 +79,7 @@ int main(int argc, char const *argv[])
             }
             else
             {
+
                 if (loaded)
                 {
                     loaded = 0;                          // unloading instructions
@@ -82,14 +88,21 @@ int main(int argc, char const *argv[])
                         free(instructions[i]);
                     }
                     free(instructions);
-                    init_tape(backup_tape); // Clearing backup tape from residuals, if any
-                    if (m_mode == 1)        // if two tapes activated, also init the second tape
-                        init_tape(second_tape->content);
+
+                    init_tape(get_first_element(main_tape_cell)); // Clearing backup tape from residuals, if any
+                    if (m_mode == 1)                              // if two tapes activated, also init the second tape
+                        init_tape(get_first_element(second_tape_cell));
                 }
 
-                check_end = 0;                                // check used to control the execution of the program. Initialized here and repeated every time before possible execution
-                instructions_n = 0;                           // resetting the counter
-                fscanf(input_file, "%s", main_tape.content);  // reads until breakline is reached
+                check_end = 0;      // check used to control the execution of the program. Initialized here and repeated every time before possible execution
+                instructions_n = 0; // resetting the counter
+
+                // rint_cell_sequence(main_tape_cell);
+
+                fill_tape(input_file, get_first_element(main_tape_cell)); // Actually praying for this
+
+                // print_cell_sequence(main_tape_cell);
+
                 while ((c = fgetc(instructions_file)) != EOF) // Instructions counting
                 {                                             // read character by character and check if the end of the file is reached
                     if (c == '\n')
@@ -147,9 +160,11 @@ int main(int argc, char const *argv[])
                         print_success_loading();
                         // initializing struct variables
                         status = '0';
-                        main_tape.pos = 0;
-                        loaded = 1;                                // setting file check for other operations
-                        copy_tape(main_tape.content, backup_tape); // backup of the tape
+
+                        main_tape_cell = get_first_element(main_tape_cell); // Starting from the first element in the list
+                        loaded = 1;                                         // setting file check for other operations
+
+                        copy_tape(main_tape_cell, main_tape_backup); // Backup of the tape
                     }
                     else
                     {
@@ -167,9 +182,11 @@ int main(int argc, char const *argv[])
         {
             if (loaded)
             {
-                print_tape(main_tape.content);
+                main_tape_cell = get_first_element(main_tape_cell);
+                // print_cell_sequence(main_tape_cell);
+                print_tape(main_tape_cell);
                 if (m_mode == 1) // If two tapes enable, also print the second tape
-                    print_tape(second_tape->content);
+                    print_tape(second_tape_cell);
             }
             else
             {
@@ -192,22 +209,23 @@ int main(int argc, char const *argv[])
         {
             if (loaded)
             {
-                print_machine_iteration(instructions[pos][0], main_tape.pos, main_tape.content); // First tape print. Useful if any instruction won't be chosen
-                if (m_mode == 0)                                                                 // If single mode chosen, use this algorithm
+                // printf("%p, %p, %p\n", main_tape_cell->prev, main_tape_cell, main_tape_cell->next);
+                print_machine_iteration(instructions[pos][0], main_tape_cell); // First tape print. Useful if any instruction won't be chosen
+                if (m_mode == 0)                                               // If single mode chosen, use this algorithm
                 {
+
                     do
                     {
                         pos = 0;
                         while (
                             (pos < instructions_n) &&
-                            (main_tape.pos < TAPE_DIM) &&
-                            (instructions[pos][0] != status || instructions[pos][1] != main_tape.content[main_tape.pos]) &&
-                            !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape.content[main_tape.pos] == '\0' || main_tape.content[main_tape.pos] == '*' || main_tape.content[main_tape.pos] == ' '))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
+                            (instructions[pos][0] != status || instructions[pos][1] != main_tape_cell->element) &&
+                            !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape_cell->element == '\0' || main_tape_cell->element == '*' || main_tape_cell->element == ' '))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
                         {
                             pos++;
                         }
 
-                        if (pos < instructions_n && main_tape.pos < TAPE_DIM)
+                        if (pos < instructions_n)
                         {
                             if (instructions[pos][2] == 'E')
                                 check_end = 1; // if END reached, unflag check and exit loop
@@ -215,16 +233,35 @@ int main(int argc, char const *argv[])
                                 status = instructions[pos][2];
 
                             if (instructions[pos][3] == '-')
-                                main_tape.content[main_tape.pos] = '*'; // I can understand if it is a machine made space
+                                main_tape_cell->element = '*'; // I can understand if it is a machine made space
                             else
-                                main_tape.content[main_tape.pos] = instructions[pos][3];
+                                main_tape_cell->element = instructions[pos][3];
 
                             if (instructions[pos][4] == '>')
-                                main_tape.pos++;
+                            {
+                                if (main_tape_cell->next == NULL)
+                                {
+                                    main_tape_cell->next = (struct cell *)calloc(1, sizeof(cell));
+                                }
+                                main_tape_cell_temp = main_tape_cell;
+                                main_tape_cell = (cell *)main_tape_cell->next;
+                                main_tape_cell->prev = (struct cell *)main_tape_cell_temp;
+                            }
                             else if (instructions[pos][4] == '<')
-                                main_tape.pos--;
+                            {
+                                if (main_tape_cell->prev == NULL)
+                                {
+                                    main_tape_cell->prev = (struct cell *)calloc(1, sizeof(cell));
+                                }
+                                // printf("%p, %p, %p\n", main_tape_cell->prev, main_tape_cell, main_tape_cell->next);
+                                main_tape_cell_temp = main_tape_cell;
+                                main_tape_cell = (cell *)main_tape_cell->prev;
+                                main_tape_cell->next = (struct cell *)main_tape_cell_temp;
+                            }
 
-                            print_machine_iteration(instructions[pos][0], main_tape.pos, main_tape.content);
+                            // printf("%p, %p, %p\n", main_tape_cell->prev, main_tape_cell, main_tape_cell->next);
+
+                            print_machine_iteration(instructions[pos][0], main_tape_cell);
                         }
                         else
                         {
@@ -234,7 +271,7 @@ int main(int argc, char const *argv[])
                 }
                 else
                 { // Else two tapes (by now, m_mode strictly set to 0 or 1), use this algorithm, which includes the additional tape. Another algorithm is required, since even the structure of instructions differs.
-                    init_tape(second_tape->content); // restoring the tape for another execution
+                    /*init_tape(second_tape->content); // restoring the tape for another execution
                     print_machine_iteration(instructions[pos][0], second_tape->pos, second_tape->content);
                     do // TODO: debug
                     {
@@ -242,12 +279,12 @@ int main(int argc, char const *argv[])
                         while (
                             (pos < instructions_n) &&
                             (main_tape.pos < TAPE_DIM) && (second_tape->pos < TAPE_DIM) &&
-                            (instructions[pos][0] != status || instructions[pos][1] != main_tape.content[main_tape.pos] || instructions[pos][2] != second_tape->content[second_tape->pos]) &&
-                            !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape.content[main_tape.pos] == '\0' || main_tape.content[main_tape.pos] == '*' || main_tape.content[main_tape.pos] == ' ')) &&
+                            (instructions[pos][0] != status || instructions[pos][1] != main_tape_cell->element || instructions[pos][2] != second_tape->content[second_tape->pos]) &&
+                            !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape_cell->element == '\0' || main_tape_cell->element == '*' || main_tape_cell->element == ' ')) &&
                             !(instructions[pos][0] == status && instructions[pos][2] == '-' && (second_tape->content[second_tape->pos] == '\0' || second_tape->content[second_tape->pos] == '*' || second_tape->content[second_tape->pos] == ' '))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
-                            {
-                                pos++;
-                            }
+                        {
+                            pos++;
+                        }
 
                         if (pos < instructions_n && main_tape.pos < TAPE_DIM && second_tape->pos < TAPE_DIM)
                         {
@@ -257,14 +294,14 @@ int main(int argc, char const *argv[])
                                 status = instructions[pos][3];
 
                             if (instructions[pos][4] == '-')
-                                main_tape.content[main_tape.pos] = '*'; // I can understand if it is a machine made space
+                                main_tape_cell->element = '*'; // I can understand if it is a machine made space
                             else
-                                main_tape.content[main_tape.pos] = instructions[pos][5];
+                                main_tape_cell->element = instructions[pos][5];
 
                             if (instructions[pos][5] == '-')
                                 second_tape->content[second_tape->pos] = '*'; // I can understand if it is a machine made space
                             else
-                                second_tape->content[second_tape->pos] = instructions[pos][6];
+                                second_tape->content[second_tape->pos] = instructions[pos][5];
 
                             if (instructions[pos][6] == '>')
                                 main_tape.pos++;
@@ -285,6 +322,7 @@ int main(int argc, char const *argv[])
                             check_end = 1; // Tape end reached or no instructions to execute
                         }
                     } while (pos < instructions_n && !check_end);
+                    */
                 }
 
                 if (pos == instructions_n)
@@ -292,13 +330,16 @@ int main(int argc, char const *argv[])
                     print_no_instruction_found_alert();
                 }
 
-                pos = 0;           // Restoring pos. Necessary for any outdated value from previous executions. If tape changes in size, then segfault would occur
-                check_end = 0;     // Restoring check end
-                status = '0';      // Restoring machine status
-                main_tape.pos = 0; // Restoring tape position
+                pos = 0;       // Restoring pos. Necessary for any outdated value from previous executions. If tape changes in size, then segfault would occur
+                check_end = 0; // Restoring check end
+                status = '0';  // Restoring machine status
+
+                main_tape_cell = get_first_element(main_tape_cell);
                 if (m_mode == 1)
-                    second_tape->pos = 0;
-                copy_tape(backup_tape, main_tape.content); // restoring the tape
+                    second_tape_cell = get_first_element(second_tape_cell);
+
+                init_tape(main_tape_cell); // clearing the main tape from previous execution. If not, in case of a shorter originale tape, the result would partially remain on the tape and not overwritten!
+                copy_tape(main_tape_backup, main_tape_cell);
             }
             else
             {
@@ -334,18 +375,18 @@ int main(int argc, char const *argv[])
                         loaded = 0;
                     m_mode = 0;
                     print_mode_change_success("SINGLE");
-                    if (second_tape != NULL)
+                    /*if (second_tape != NULL)
                     {
                         free(second_tape); // freeing space allocated for the second tape
-                    }
+                    }*/
                 }
                 else if (user_choice[0] == '2')
                 {
                     m_mode = 1;
                     print_mode_change_success("TWO");
-                    second_tape = (tape *)malloc(sizeof(tape));
-                    init_tape(second_tape->content); // Second tape init
-                    loaded = 0;                      // Refresh of loaded instructions required. To avoid that older single tape instructions could be processed as two tapes and generate false positives about syntax errors
+                    // second_tape = (tape *)malloc(sizeof(tape));
+                    // init_tape(second_tape->content); // Second tape init
+                    loaded = 0; // Refresh of loaded instructions required. To avoid that older single tape instructions could be processed as two tapes and generate false positives about syntax errors
                 }
                 else
                     printf("Invalid option\n");
@@ -364,6 +405,14 @@ int main(int argc, char const *argv[])
 
             print_exiting();
             check_menu = 0;
+
+            //printf("%p, %p, %p\n", main_tape_cell->prev, main_tape_cell, main_tape_cell->next);
+
+            //print_cell_sequence(main_tape_cell); TODO: manage free
+            //free_tape(get_first_element(main_tape_cell));
+            //printf("%p, %p, %p\n", main_tape_cell->prev, main_tape_cell, main_tape_cell->next);
+
+            
         }
         else
         {

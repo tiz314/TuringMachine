@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "./headers/consts.h"
+#include "./headers/tm_tools.h"
 
 void clear_screen()
 {
@@ -30,7 +31,7 @@ void print_boot()
     printf("                                         |  $$$$$$/                                                                         \n");
     printf("                                          \\______/                                                                          \n");
     printf("==============================================================================================================================\n");
-    usleep(WAIT_TIME * 100);
+    //usleep(WAIT_TIME * 100);
 }
 
 /*void print_config_error()
@@ -99,18 +100,18 @@ void print_command_not_found()
     printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
 }
 
-void print_tape(char tape[])
+void print_tape(cell *c)
 {
-    int i, tape_dim = strlen(tape);
-    if (tape_dim)
+    cell *cp;
+    if (c->element || c != NULL)
     {
         printf("\n|  ");
-        for (i = 0; i < tape_dim; i++)
+        for (cp = get_first_element(c); cp->next != NULL; cp = (cell *)cp->next)
         {
-            if (tape[i] == '*' || tape[i] == '\0')
+            if (cp->element == '*')
                 printf("   |  ");
             else
-                printf("%c  |  ", tape[i]);
+                printf("%c  |  ", cp->element);
         }
     }
     else
@@ -141,11 +142,11 @@ void print_instructions(char **instructions, int instructions_n, int mode)
     printf("\n");
 }
 
-void print_machine_iteration(char status, int tape_position, char tape[])
+void print_machine_iteration(char status, cell *c)
 {
     printf("------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
-    printf("STATUS: %c\tTAPE POSITION: %d\n", status, tape_position);
-    print_tape(tape);
+    printf("STATUS: %c\n", status);
+    print_tape(c);
     printf("------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
 }
 

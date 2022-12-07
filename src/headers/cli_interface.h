@@ -4,9 +4,9 @@ void print_boot();
 void print_help();
 void print_about();
 void print_settings();
-void print_tape(char tape[]);
+void print_tape(cell *c);
 void print_instructions(char **instructions, int instructions_n, int mode);
-void print_machine_iteration(char status, int tape_position, char tape[]);
+void print_machine_iteration(char status, cell *c);
 
 void print_changing_tm_mode();
 
