@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "./headers/consts.h"
-#include "./headers/tm_tools.h" // TODO: is it correct?
+#include "./headers/tm_tools.h" // necessary to find typedef in header file
 
 /*
 The instruction schema used for instructions depends on the two main modes of operation of the machine: one or two tapes:
@@ -23,7 +23,7 @@ void print_cell_sequence(cell *c) // Only for debugging!
 {
     for (cell *cp = c; cp != NULL; cp = (cell *)cp->next)
     {
-        printf("%p, %p, %p: %c\n", cp->prev, cp, cp->next, cp->element);
+        printf("%p, %p, %p: %d\n", cp->prev, cp, cp->next, cp->element);
     }
     puts("");
 }
@@ -71,13 +71,13 @@ void fill_tape(FILE *input_file, cell *c)
 
 void free_tape(cell *c)
 {
-    /*cell *cp = (cell *)c->next, *temp_cp;
-    while(cp != NULL){
-        temp_cp = cp;
+    cell *cp = (cell *)c->next, *temp_cp;
+    while (cp != NULL)
+    {
+        temp_cp = (cell *)cp->next;
         free(cp);
-        cp = (cell *)temp_cp->next;
+        cp = (cell *)temp_cp;
     }
-    free(c);*/
     free(c);
 }
 

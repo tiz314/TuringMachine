@@ -31,7 +31,7 @@ void print_boot()
     printf("                                         |  $$$$$$/                                                                         \n");
     printf("                                          \\______/                                                                          \n");
     printf("==============================================================================================================================\n");
-    //usleep(WAIT_TIME * 100);
+    // usleep(WAIT_TIME * 100);
 }
 
 /*void print_config_error()
@@ -79,6 +79,13 @@ void print_mode_change_success(char *input)
     printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
 }
 
+void print_mode_unchanged()
+{
+    printf("________________\n");
+    printf("MODE ALREADY SET\n");
+    printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
+}
+
 void print_loading_warning()
 {
     printf("______________________________________________________________________________________________________________\n");
@@ -100,23 +107,26 @@ void print_command_not_found()
     printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
 }
 
-void print_tape(cell *c)
+void print_tape(cell *c, int tape_number)
 {
-    cell *cp;
-    if (c->element || c != NULL)
+    cell *cp = get_first_element(c);
+    printf("\n#%d: ", tape_number);
+    if (cp->element)
     {
-        printf("\n|  ");
-        for (cp = get_first_element(c); cp->next != NULL; cp = (cell *)cp->next)
+        printf("|  ");
+
+        while (cp != NULL && cp->element != 0)
         {
             if (cp->element == '*')
                 printf("   |  ");
             else
                 printf("%c  |  ", cp->element);
+            cp = (cell *)cp->next;
         }
     }
     else
     {
-        printf("\nTape is empty");
+        printf("Tape is empty");
     }
     printf("\n");
 }
@@ -142,11 +152,11 @@ void print_instructions(char **instructions, int instructions_n, int mode)
     printf("\n");
 }
 
-void print_machine_iteration(char status, cell *c)
+void print_machine_iteration(char status, cell *c, int tape_number)
 {
     printf("------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
     printf("STATUS: %c\n", status);
-    print_tape(c);
+    print_tape(c, tape_number);
     printf("------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
 }
 
