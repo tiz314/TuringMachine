@@ -13,7 +13,7 @@ int main(int argc, char const *argv[])
     __uint8_t check_end, check_menu = 1, loaded = 0, i, j; // check if END command reached; check for the menu cycle; check for file loading; general purpose counters
     char user_choice[BUFSIZ];                              // user input in the menu. pre-defined size because of the possibility to enter string commands
 
-    __uint8_t m_mode;                  // Machine mode of operation: it can be 0 (one tape machine) or 1 (two tapes machine)
+    __uint8_t m_mode, exec_mode;       // Machine mode of operation: it can be 0 (one tape machine) or 1 (two tapes machine); Exec mode. It can be 0 (continuous) or 1 (step by step)
     char status;                       // current machine status, starts from 0
     unsigned short int instructions_n; // number of received instructions
     unsigned short int pos;            // positive counter for the position in the instruction matrix
@@ -33,7 +33,8 @@ int main(int argc, char const *argv[])
     FILE *instructions_file;
     // FILE *config_file = fopen("./settings.conf", "rw"); // Config file, contains information about the configuration of the machine
 
-    m_mode = 0; // Setting the single tape mode as default
+    m_mode = 0;    // Setting the single tape mode as default
+    exec_mode = 0; // Setting the continuous mode as default
 
     print_boot();
 
@@ -54,14 +55,6 @@ int main(int argc, char const *argv[])
     while (check_menu)
     {
         printf(PROMPT);
-
-        printf("%p %p %p\t", main_tape_cell, main_tape_backup, second_tape_cell);
-        if (second_tape_cell != NULL)
-        {
-            printf("%d\n", second_tape_cell->element);
-        }
-        else
-            puts("");
         scanf("\n"); // Removing from buffer any residuals from previous input. Necessary for settings dialog inputs
         fgets(user_choice, BUFSIZ, stdin);
         user_choice[strlen(user_choice) - 1] = '\0'; // receveing user input and removing \n for strcmp. Fgets is necessary because some commands include spaces, not included by scanf function
@@ -179,9 +172,6 @@ int main(int argc, char const *argv[])
         {
             if (loaded)
             {
-                print_cell_sequence(main_tape_cell);
-                printf("Second\n");
-                print_cell_sequence(second_tape_cell);
                 print_tape(main_tape_cell, 1);
                 if (m_mode == 1)
                 { // If two tapes enable, also print the second tape
@@ -215,53 +205,65 @@ int main(int argc, char const *argv[])
 
                     do
                     {
-                        pos = 0;
-                        while (
-                            (pos < instructions_n) &&
-                            (instructions[pos][0] != status || instructions[pos][1] != main_tape_cell->element) &&
-                            !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape_cell->element == '\0' || main_tape_cell->element == '*' || main_tape_cell->element == ' '))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
-                        {
-                            pos++;
-                        }
-
-                        if (pos < instructions_n)
-                        {
-                            if (instructions[pos][2] == 'E')
-                                check_end = 1; // if END reached, unflag check and exit loop
-                            else
-                                status = instructions[pos][2];
-
-                            if (instructions[pos][3] == '-')
-                                main_tape_cell->element = '*'; // I can understand if it is a machine made space
-                            else
-                                main_tape_cell->element = instructions[pos][3];
-
-                            if (instructions[pos][4] == '>')
+                        if (exec_mode)
+                        { // If step by step enabled:
+                            printf("Press enter to continue ('q' to terminate)\n");
+                            fgets(user_choice, BUFSIZ, stdin);
+                            if (user_choice[0] == 'q')
                             {
-                                if (main_tape_cell->next == NULL)
-                                {
-                                    main_tape_cell->next = (struct cell *)malloc(sizeof(cell));
-                                }
-                                tape_cell_temp = main_tape_cell;
-                                main_tape_cell = (cell *)main_tape_cell->next;
-                                main_tape_cell->prev = (struct cell *)tape_cell_temp;
+                                check_end = 1;
                             }
-                            else if (instructions[pos][4] == '<')
+                        }
+                        if (!check_end) // To avoid executing useless code if user decided to exit
+                        {
+                            pos = 0;
+                            while (
+                                (pos < instructions_n) &&
+                                (instructions[pos][0] != status || instructions[pos][1] != main_tape_cell->element) &&
+                                !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape_cell->element == '\0'))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
                             {
-                                if (main_tape_cell->prev == NULL)
-                                {
-                                    main_tape_cell->prev = (struct cell *)malloc(sizeof(cell));
-                                }
-                                tape_cell_temp = main_tape_cell;
-                                main_tape_cell = (cell *)main_tape_cell->prev;
-                                main_tape_cell->next = (struct cell *)tape_cell_temp;
+                                pos++;
                             }
 
-                            print_machine_iteration(instructions[pos][0], main_tape_cell, 1);
-                        }
-                        else
-                        {
-                            check_end = 1; // Tape end reached or no instructions to execute
+                            if (pos < instructions_n)
+                            {
+                                if (instructions[pos][2] == 'E')
+                                    check_end = 1; // if END reached, unflag check and exit loop
+                                else
+                                    status = instructions[pos][2];
+
+                                if (instructions[pos][3] == '-')
+                                    main_tape_cell->element = '\0'; // I can understand if it is a machine made space
+                                else
+                                    main_tape_cell->element = instructions[pos][3];
+
+                                if (instructions[pos][4] == '>')
+                                {
+                                    if (main_tape_cell->next == NULL)
+                                    {
+                                        main_tape_cell->next = (struct cell *)malloc(sizeof(cell));
+                                    }
+                                    tape_cell_temp = main_tape_cell;
+                                    main_tape_cell = (cell *)main_tape_cell->next;
+                                    main_tape_cell->prev = (struct cell *)tape_cell_temp;
+                                }
+                                else if (instructions[pos][4] == '<')
+                                {
+                                    if (main_tape_cell->prev == NULL)
+                                    {
+                                        main_tape_cell->prev = (struct cell *)malloc(sizeof(cell));
+                                    }
+                                    tape_cell_temp = main_tape_cell;
+                                    main_tape_cell = (cell *)main_tape_cell->prev;
+                                    main_tape_cell->next = (struct cell *)tape_cell_temp;
+                                }
+
+                                print_machine_iteration(instructions[pos][0], main_tape_cell, 1);
+                            }
+                            else
+                            {
+                                check_end = 1; // Tape end reached or no instructions to execute
+                            }
                         }
                     } while (pos < instructions_n && !check_end);
                 }
@@ -273,84 +275,93 @@ int main(int argc, char const *argv[])
 
                     do
                     {
-                        pos = 0;
-                        while (
-                            (pos < instructions_n) &&
-                            (instructions[pos][0] != status || instructions[pos][1] != main_tape_cell->element || instructions[pos][2] != second_tape_cell->element) &&
-                            !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape_cell->element == '\0' || main_tape_cell->element == '*' || main_tape_cell->element == ' ')) &&
-                            !(instructions[pos][0] == status && instructions[pos][2] == '-' && (second_tape_cell->element == '\0' || second_tape_cell->element == '*' || second_tape_cell->element == ' '))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
-                        {                                                                                                                                                                                    // TODO: debug here (maybe)
-                            pos++;
+                        if (exec_mode)
+                        { // If step by step enabled:
+                            printf("Press enter to continue ('q' to terminate)\n");
+                            fgets(user_choice, BUFSIZ, stdin);
+                            if (user_choice[0] == 'q')
+                            {
+                                check_end = 1;
+                            }
                         }
-                        printf("POS: %d\n", pos);
-                        printf("ELEMENT> %d\n", second_tape_cell->element);
-                        if (pos < instructions_n)
+                        if (!check_end)
                         {
-                            if (instructions[pos][3] == 'E')
-                                check_end = 1; // if END reached, unflag check and exit loop
+                            pos = 0;
+                            while (
+                                (pos < instructions_n) &&
+                                (instructions[pos][0] != status || instructions[pos][1] != main_tape_cell->element || instructions[pos][2] != second_tape_cell->element) &&
+                                !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape_cell->element == '\0') && instructions[pos][2] == second_tape_cell->element) &&
+                                !(instructions[pos][0] == status && instructions[pos][2] == '-' && (second_tape_cell->element == '\0') && instructions[pos][1] == main_tape_cell->element)) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
+                            {                                                                                                                                                               // TODO: debug here (maybe)
+                                pos++;
+                            }
+                            if (pos < instructions_n)
+                            {
+                                if (instructions[pos][3] == 'E')
+                                    check_end = 1; // if END reached, unflag check and exit loop
+                                else
+                                    status = instructions[pos][3];
+
+                                if (instructions[pos][4] == '-')    // Second tape input
+                                    main_tape_cell->element = '\0'; // I can understand if it is a machine made space
+                                else
+                                    main_tape_cell->element = instructions[pos][4];
+
+                                if (instructions[pos][5] == '-')      // Second tape input
+                                    second_tape_cell->element = '\0'; // I can understand if it is a machine made space
+                                else
+                                    second_tape_cell->element = instructions[pos][5];
+
+                                if (instructions[pos][6] == '>') // Main tape head movement
+                                {
+                                    if (main_tape_cell->next == NULL)
+                                    {
+                                        main_tape_cell->next = (struct cell *)malloc(sizeof(cell));
+                                    }
+                                    tape_cell_temp = main_tape_cell;
+                                    main_tape_cell = (cell *)main_tape_cell->next;
+                                    main_tape_cell->prev = (struct cell *)tape_cell_temp;
+                                }
+                                else if (instructions[pos][6] == '<')
+                                {
+                                    if (main_tape_cell->prev == NULL)
+                                    {
+                                        main_tape_cell->prev = (struct cell *)malloc(sizeof(cell));
+                                    }
+                                    tape_cell_temp = main_tape_cell;
+                                    main_tape_cell = (cell *)main_tape_cell->prev;
+                                    main_tape_cell->next = (struct cell *)tape_cell_temp;
+                                }
+
+                                if (instructions[pos][7] == '>') // Second tape head movement
+                                {
+                                    if (second_tape_cell->next == NULL)
+                                    {
+                                        second_tape_cell->next = (struct cell *)calloc(1, sizeof(cell));
+                                    }
+                                    tape_cell_temp = second_tape_cell;
+                                    second_tape_cell = (cell *)second_tape_cell->next;
+                                    second_tape_cell->prev = (struct cell *)tape_cell_temp;
+                                }
+                                else if (instructions[pos][7] == '<')
+                                {
+                                    if (second_tape_cell->prev == NULL)
+                                    {
+                                        second_tape_cell->prev = (struct cell *)calloc(1, sizeof(cell));
+                                    }
+                                    tape_cell_temp = second_tape_cell;
+                                    second_tape_cell = (cell *)second_tape_cell->prev;
+                                    second_tape_cell->next = (struct cell *)tape_cell_temp;
+                                }
+
+                                print_machine_iteration(instructions[pos][0], main_tape_cell, 1);
+                                print_machine_iteration(instructions[pos][0], second_tape_cell, 2);
+                                printf("\n");
+                            }
                             else
-                                status = instructions[pos][2];
-
-                            if (instructions[pos][4] == '-')   // Second tape input
-                                main_tape_cell->element = '*'; // I can understand if it is a machine made space
-                            else
-                                main_tape_cell->element = instructions[pos][4];
-
-                            if (instructions[pos][5] == '-')     // Second tape input
-                                second_tape_cell->element = '*'; // I can understand if it is a machine made space
-                            else
-                                second_tape_cell->element = instructions[pos][5];
-
-                            if (instructions[pos][6] == '>') // Main tape head movement
                             {
-                                if (main_tape_cell->next == NULL)
-                                {
-                                    main_tape_cell->next = (struct cell *)malloc(sizeof(cell));
-                                }
-                                tape_cell_temp = main_tape_cell;
-                                main_tape_cell = (cell *)main_tape_cell->next;
-                                main_tape_cell->prev = (struct cell *)tape_cell_temp;
+                                check_end = 1; // Tape end reached or no instructions to execute
                             }
-                            else if (instructions[pos][6] == '<')
-                            {
-                                if (main_tape_cell->prev == NULL)
-                                {
-                                    main_tape_cell->prev = (struct cell *)malloc(sizeof(cell));
-                                }
-                                tape_cell_temp = main_tape_cell;
-                                main_tape_cell = (cell *)main_tape_cell->prev;
-                                main_tape_cell->next = (struct cell *)tape_cell_temp;
-                            }
-
-                            if (instructions[pos][7] == '>') // Second tape head movement
-                            {
-                                if (second_tape_cell->next == NULL)
-                                {
-                                    second_tape_cell->next = (struct cell *)malloc(sizeof(cell));
-                                }
-                                tape_cell_temp = second_tape_cell;
-                                second_tape_cell = (cell *)second_tape_cell->next;
-                                second_tape_cell->prev = (struct cell *)tape_cell_temp;
-                            }
-                            else if (instructions[pos][7] == '<')
-                            {
-                                if (second_tape_cell->prev == NULL)
-                                {
-                                    second_tape_cell->prev = (struct cell *)malloc(sizeof(cell));
-                                }
-                                tape_cell_temp = second_tape_cell;
-                                second_tape_cell = (cell *)second_tape_cell->prev;
-                                second_tape_cell->next = (struct cell *)tape_cell_temp;
-                            }
-
-                            print_machine_iteration(instructions[pos][0], main_tape_cell, 1);
-                            print_cell_sequence(get_first_element(second_tape_cell));
-                            print_machine_iteration(instructions[pos][0], second_tape_cell, 2);
-                            printf("\n");
-                        }
-                        else
-                        {
-                            check_end = 1; // Tape end reached or no instructions to execute
                         }
                     } while (pos < instructions_n && !check_end);
                 }
@@ -393,7 +404,9 @@ int main(int argc, char const *argv[])
             print_settings();
             printf(PROMPT);
             scanf("\n%s", user_choice);
-            if (user_choice[0] == '1')
+            switch (user_choice[0])
+            {
+            case '1':
             {
                 print_changing_tm_mode();
                 printf(PROMPT);
@@ -429,10 +442,46 @@ int main(int argc, char const *argv[])
                 }
                 else
                     printf("Invalid option\n");
+                break;
             }
-            else
+            case '2':
+            {
+                print_changing_stbst_exec();
+                printf(PROMPT);
+                scanf("\n%s", user_choice);
+
+                if (user_choice[0] == '1') // switching between modes of operation (step by step exec and continuous)
+                {
+                    if (exec_mode == 0)
+                    {
+                        exec_mode = 1;
+                        printf("Success\n");
+                    }
+                    else
+                    {
+                        print_mode_unchanged();
+                    }
+                }
+                else if (user_choice[0] == '2')
+                {
+                    if (exec_mode == 1)
+                    {
+                        exec_mode = 0;
+                        printf("Success\n");
+                    }
+                    else
+                    {
+                        print_mode_unchanged();
+                    }
+                }
+                else
+                    printf("Invalid option\n");
+                break;
+            }
+            default:
             {
                 printf("\nExiting settings...\n");
+            }
             }
         }
         else if (!strcmp(user_choice, "EXIT"))

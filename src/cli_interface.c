@@ -64,12 +64,17 @@ void print_about()
 
 void print_settings()
 {
-    printf("\n1- Change TM mode\n2- Exit settings\n");
+    printf("\n1- Change TM mode\n2- Step by step Execution\n3- Exit settings\n");
 }
 
 void print_changing_tm_mode()
 {
     printf("One tape (1)\nTwo tapes (2)\n");
+}
+
+void print_changing_stbst_exec()
+{
+    printf("Enabled (1)\nDisabled (2)\n");
 }
 
 void print_mode_change_success(char *input)
@@ -111,11 +116,11 @@ void print_tape(cell *c, int tape_number)
 {
     cell *cp = get_first_element(c);
     printf("\n#%d: ", tape_number);
-    if (cp->element)
+    if (cp->element || cp->next != NULL)
     {
         printf("|  ");
 
-        while (cp != NULL && cp->element != 0)
+        while (cp != NULL)
         {
             if (cp->element == '*')
                 printf("   |  ");

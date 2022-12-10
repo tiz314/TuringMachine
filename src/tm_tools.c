@@ -57,7 +57,11 @@ void fill_tape(FILE *input_file, cell *c)
     cell *cp = c, *swap_cp;
     while (fscanf(input_file, "%c", &from_file) != -1)
     {
-        cp->element = from_file;
+        if (from_file == ' ')
+            cp->element = 0;
+        else
+            cp->element = from_file;
+            
         if (cp->next == NULL)
         {
             cp->next = (struct cell *)calloc(1, sizeof(cell));
