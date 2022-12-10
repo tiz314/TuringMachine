@@ -14,9 +14,9 @@ To run the program, you can clone the repo on your local directory by using:
 ```
 git clone https://github.com/tiz314/TuringMachine
 ```
-Then, you can compile the program by using:
+Then, you can compile the program by using (in the src folder):
 ```
-gcc ./main.c -o main
+make
 ```
 Finally, you can run the binary file. 
 
