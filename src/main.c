@@ -21,8 +21,8 @@ int main(int argc, char const *argv[])
     char **instructions; // char pointer for dynamic matrix of instructions
 
     cell *tape_cell_temp; // used as temporary variable for prev pointer while adding an element
-    cell *main_tape_cell = (cell *)malloc(sizeof(cell));
-    cell *main_tape_backup = (cell *)malloc(sizeof(cell));
+    cell *main_tape_cell = (cell *)calloc(1, sizeof(cell));
+    cell *main_tape_backup = (cell *)calloc(1, sizeof(cell));
 
     // ** ONLY FOR TWO TAPES MODE, IF ENABLED **
     cell *second_tape_cell; // Eventually used pointer to tape struct, containing a char array and an int used as position counter
@@ -241,7 +241,7 @@ int main(int argc, char const *argv[])
                                 {
                                     if (main_tape_cell->next == NULL)
                                     {
-                                        main_tape_cell->next = (struct cell *)malloc(sizeof(cell));
+                                        main_tape_cell->next = (struct cell *)calloc(1, sizeof(cell));
                                     }
                                     tape_cell_temp = main_tape_cell;
                                     main_tape_cell = (cell *)main_tape_cell->next;
@@ -251,7 +251,7 @@ int main(int argc, char const *argv[])
                                 {
                                     if (main_tape_cell->prev == NULL)
                                     {
-                                        main_tape_cell->prev = (struct cell *)malloc(sizeof(cell));
+                                        main_tape_cell->prev = (struct cell *)calloc(1, sizeof(cell));
                                     }
                                     tape_cell_temp = main_tape_cell;
                                     main_tape_cell = (cell *)main_tape_cell->prev;
@@ -290,9 +290,9 @@ int main(int argc, char const *argv[])
                             while (
                                 (pos < instructions_n) &&
                                 (instructions[pos][0] != status || instructions[pos][1] != main_tape_cell->element || instructions[pos][2] != second_tape_cell->element) &&
-                                !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape_cell->element == '\0') && instructions[pos][2] == second_tape_cell->element) &&
-                                !(instructions[pos][0] == status && instructions[pos][2] == '-' && (second_tape_cell->element == '\0') && instructions[pos][1] == main_tape_cell->element)) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
-                            {                                                                                                                                                               // TODO: debug here (maybe)
+                                !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape_cell->element == '\0') && (instructions[pos][2] == second_tape_cell->element || instructions[pos][2] == '-' && (second_tape_cell->element == '\0'))) &&
+                                !(instructions[pos][0] == status && instructions[pos][2] == '-' && (second_tape_cell->element == '\0') && (instructions[pos][1] == main_tape_cell->element || instructions[pos][1] == '-' && (main_tape_cell->element == '\0')))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
+                            {                                                                                                                                                                                                                                     // TODO: Improve this thing pls
                                 pos++;
                             }
                             if (pos < instructions_n)
@@ -316,7 +316,7 @@ int main(int argc, char const *argv[])
                                 {
                                     if (main_tape_cell->next == NULL)
                                     {
-                                        main_tape_cell->next = (struct cell *)malloc(sizeof(cell));
+                                        main_tape_cell->next = (struct cell *)calloc(1, sizeof(cell));
                                     }
                                     tape_cell_temp = main_tape_cell;
                                     main_tape_cell = (cell *)main_tape_cell->next;
@@ -326,7 +326,7 @@ int main(int argc, char const *argv[])
                                 {
                                     if (main_tape_cell->prev == NULL)
                                     {
-                                        main_tape_cell->prev = (struct cell *)malloc(sizeof(cell));
+                                        main_tape_cell->prev = (struct cell *)calloc(1, sizeof(cell));
                                     }
                                     tape_cell_temp = main_tape_cell;
                                     main_tape_cell = (cell *)main_tape_cell->prev;
@@ -430,7 +430,7 @@ int main(int argc, char const *argv[])
                 {
                     if (m_mode == 0)
                     {
-                        second_tape_cell = (cell *)malloc(sizeof(cell)); // Only if actually switching from one tape mode to two tape mode. If not, not doing another malloc
+                        second_tape_cell = (cell *)calloc(1, sizeof(cell)); // Only if actually switching from one tape mode to two tape mode. If not, not doing another malloc
                         m_mode = 1;
                         print_mode_change_success("TWO");
                         loaded = 0; // Refresh of loaded instructions required. To avoid that older single tape instructions could be processed as two tapes and generate false positives about syntax errors
@@ -495,6 +495,8 @@ int main(int argc, char const *argv[])
             check_menu = 0;
             free_tape(main_tape_cell);
             free_tape(main_tape_backup);
+            if (m_mode == 1)
+                free_tape(second_tape_cell);
         }
         else
         {
