@@ -14,9 +14,9 @@ To run the program, you can clone the repo on your local directory by using:
 ```
 git clone https://github.com/tiz314/TuringMachine
 ```
-Then, you can compile the program by using:
+Then, you can compile the program by using (in the src folder):
 ```
-gcc ./main.c -o main
+make
 ```
 Finally, you can run the binary file. 
 
@@ -26,7 +26,7 @@ You need to follow the following syntax rules for the instructions:
 - To represent an empty slot on the tape, regardless of the rule in the instruction, you need to use `-`
 - To give the command to exit the program, use the letter E
 
-By now, the implementation doesn't accept status called by names, but only represented by a single character (numbers and letters)
+By now, the implementation doesn't accept states called by names, but only represented by a single character (numbers and letters, so 35 possible states)
 
 ## Credits
 
