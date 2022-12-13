@@ -123,9 +123,13 @@ void print_tape(cell *c, int tape_number)
         while (cp != NULL)
         {
             if (cp->element == '*')
+            {
                 printf("   |  ");
+            }
             else
+            {
                 printf("%c  |  ", cp->element);
+            }
             cp = (cell *)cp->next;
         }
     }
@@ -141,7 +145,9 @@ void print_instructions(char **instructions, int instructions_n, int mode)
     int i, j, size = mode ? TWO_TAPES_RULES_NUMBER : SINGLE_TAPE_RULES_NUMBER;
     printf("\n=====================");
     if (mode)
+    {
         printf("============");
+    }
     printf("\n");
     for (i = 0; i < instructions_n; i++)
     {
@@ -153,7 +159,9 @@ void print_instructions(char **instructions, int instructions_n, int mode)
     }
     printf("=====================");
     if (mode)
+    {
         printf("============");
+    }
     printf("\n");
 }
 

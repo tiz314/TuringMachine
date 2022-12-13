@@ -419,7 +419,7 @@ int main(int argc, char const *argv[])
             {
                 print_changing_tm_mode();
                 printf(PROMPT);
-                scanf("\n%s", user_choice);
+                scanf("\n%1s", user_choice);
 
                 if (user_choice[0] == '1') // switching between modes of operation (single tape of two tapes)
                 {
