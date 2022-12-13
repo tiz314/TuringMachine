@@ -28,6 +28,12 @@ You need to follow the following syntax rules for the instructions:
 
 By now, the implementation doesn't accept states called by names, but only represented by a single character (numbers and letters, so 35 possible states)
 
+The execution can also be switched to step-by-step execution to better understand the algorithm behaviour.
+
+### Multiple tapes
+
+The software includes an implementation of a different version of the original Universal turing machine, including the possibility to use two different tapes instead of one. 
+
 ## Credits
 
 Thanks to [Mighty Gibbon](https://github.com/alberto-mg) for the first version of the file management and Staring Linus :| for the great idea!
