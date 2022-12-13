@@ -34,11 +34,11 @@ void print_boot()
     // usleep(WAIT_TIME * 100);
 }
 
-/*void print_config_error()
+void print_config_error()
 {
-    printf("______________________________________________________________________________________\n");
-    printf("WARNING: ERRORS IN THE CONFIG FILE HAVE BEEN FOUND. THE MACHINE IS SET TO DEFAULT SETTINGS\n");
-    printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
+    printf("_________________________________________________________________\n");
+    printf("WARNING: CONFIG NOT FOUND. THE MACHINE IS SET TO DEFAULT SETTINGS\n");
+    printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
 }
 
 void print_config_loading_error()
@@ -46,7 +46,7 @@ void print_config_loading_error()
     printf("______________________________________________________________________________\n");
     printf("ERROR: THE CONFIG FILE CONTAINS ERRORS. THE MACHINE IS SET TO DEFAULT SETTINGS\n");
     printf("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n");
-}*/
+}
 
 void print_help()
 {

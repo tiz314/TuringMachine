@@ -84,23 +84,3 @@ void free_tape(cell *c)
     }
     free(c);
 }
-
-/*void set_default_settings(tm_components *m)
-{                  // In case of errors while loading config file, default settings are provided
-    m->m_mode = 0; // Mode of operation is set to single tape mode
-    // Update if new settings introduced
-}
-
-int load_settings(FILE *file, tm_components *m)
-{
-    __uint8_t success = 1, mode;
-    if (scanf("tmmode: %hhd", &mode) != 1)
-        success = 0;
-
-    // For possible implementation of new settings in the future.
-
-    if (success)
-        return 0;
-    else
-        return -1;
-}*/

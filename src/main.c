@@ -13,10 +13,10 @@ int main(int argc, char const *argv[])
     __uint8_t check_end, check_menu = 1, loaded = 0, i, j; // check if END command reached; check for the menu cycle; check for file loading; general purpose counters
     char user_choice[BUFSIZ];                              // user input in the menu. pre-defined size because of the possibility to enter string commands
 
-    __uint8_t m_mode, exec_mode;       // Machine mode of operation: it can be 0 (one tape machine) or 1 (two tapes machine); Exec mode. It can be 0 (continuous) or 1 (step by step)
-    char status;                       // current machine status, starts from 0
-    unsigned short int instructions_n; // number of received instructions
-    unsigned short int pos;            // positive counter for the position in the instruction matrix
+    __uint8_t m_mode, exec_mode, config_load_success = 1; // Machine mode of operation: it can be 0 (one tape machine) or 1 (two tapes machine); Exec mode. It can be 0 (continuous) or 1 (step by step)
+    char status;                                          // current machine status, starts from 0
+    unsigned short int instructions_n;                    // number of received instructions
+    unsigned short int pos;                               // positive counter for the position in the instruction matrix
 
     char **instructions; // char pointer for dynamic matrix of instructions
 
@@ -31,26 +31,35 @@ int main(int argc, char const *argv[])
     char c;           // char use to read single chars from files
     FILE *input_file; // opens read only input.txt and instructions.txt
     FILE *instructions_file;
-    // FILE *config_file = fopen("./settings.conf", "rw"); // Config file, contains information about the configuration of the machine
-
-    m_mode = 0;    // Setting the single tape mode as default
-    exec_mode = 0; // Setting the continuous mode as default
+    FILE *config_file = fopen("../settings.conf", "rw"); // Config file, contains information about the configuration of the machine
 
     print_boot();
 
-    /*if (config_file == NULL) // config file loading process, handling possible errors
+    if (config_file == NULL) // config file loading process, handling possible errors
     {
         print_config_error();
-        //set_default_settings(&m);
+        config_load_success = 0;
     }
     else
     {
-        if (load_settings(config_file, &m) == -1)
+        if (fscanf(config_file, "tmmode: %hhd\n", &m_mode) != 1 || (m_mode != 0 && m_mode != 1))
+        {
+            config_load_success = 0;
+        }
+        if (fscanf(config_file, "execmode: %hhd", &exec_mode) != 1 || (exec_mode != 0 && exec_mode != 1))
+        {
+            config_load_success = 0;
+        }
+        if (!config_load_success)
         {
             print_config_loading_error();
-          //  set_default_settings(&m);
         }
-    }*/
+    }
+    if (!config_load_success)
+    {
+        m_mode = 0;    // Setting the single tape mode as default
+        exec_mode = 0; // Setting the continuous mode as default
+    }
 
     while (check_menu)
     {
@@ -420,6 +429,7 @@ int main(int argc, char const *argv[])
                         free_tape(second_tape_cell); // If switch from two tape to one tape, freeing space used for the second tape
                         m_mode = 0;
                         print_mode_change_success("SINGLE");
+                        init_tape(main_tape_cell); // In order to clear the tape from previous executions
                     }
                     else
                     {
@@ -487,9 +497,17 @@ int main(int argc, char const *argv[])
         else if (!strcmp(user_choice, "EXIT"))
         {
             if (instructions_file)
+            {
                 fclose(instructions_file);
+            }
             if (input_file)
+            {
                 fclose(input_file); // Cosing files
+            }
+            if (config_file)
+            {
+                fclose(config_file);
+            }
 
             print_exiting();
             check_menu = 0;

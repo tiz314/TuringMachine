@@ -22,5 +22,7 @@ void print_mode_unchanged();
 
 void print_error_during_loading();
 void print_command_not_found();
+void print_config_error();
+void print_config_loading_error();
 
 void print_exiting();
