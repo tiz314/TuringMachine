@@ -26,7 +26,13 @@ You need to follow the following syntax rules for the instructions:
 - To represent an empty slot on the tape, regardless of the rule in the instruction, you need to use `-`
 - To give the command to exit the program, use the letter E
 
-By now, the implementation doesn't accept states called by names, but only represented by a single character (numbers and letters, so 35 possible states)
+By now, the implementation doesn't accept states called by names, but only represented by a single character (numbers and letters, actually each char)
+
+The execution can also be switched to step-by-step execution to better understand the algorithm behaviour.
+
+### Multiple tapes
+
+The software includes an implementation of a different version of the original Universal turing machine, including the possibility to use two different tapes instead of one. 
 
 ## Credits
 
