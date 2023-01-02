@@ -10,6 +10,7 @@
 
 #if defined(_WIN32) || defined(_WIN64)
     #include<windows.h>
+    typedef u_int8_t __u_int8_t;
 #else
     #include<unistd.h>
 #endif

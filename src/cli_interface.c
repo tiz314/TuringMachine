@@ -11,7 +11,7 @@ void clear_screen()
     printf("\033[2J");
     printf("\033[0;0f");
 #else
-    clrscr();
+    system("cls");
 #endif
 }
 
