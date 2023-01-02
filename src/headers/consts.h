@@ -8,12 +8,8 @@
 #define TAPE_PATH "../input/tape.txt"
 #define INSTR_PATH "../input/instructions.txt"
 
-#ifdef __linux__ // including libraries for sleep, based on platform on which you compile
-#include <unistd.h>
+#if defined(_WIN32) || defined(_WIN64)
+    #include<windows.h>
 #else
-#include <windows.h>
-#endif
-
-#ifndef __linux__ // renaming __uint8_t for windows platform
-typedef uint8_t __uint8_t
+    #include<unistd.h>
 #endif
