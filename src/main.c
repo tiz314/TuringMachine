@@ -22,7 +22,7 @@ int main(int argc, char const *argv[])
 
     cell *tape_cell_temp; // used as temporary variable for prev pointer while adding an element
     cell *main_tape_cell = (cell *)calloc(1, sizeof(cell));
-    cell *main_tape_backup = (cell *)calloc(1, sizeof(cell));
+    cell *main_tape_backup = (cell *)calloc(1, sizeof(cell)); // useful to avoid requiring reload after execs
 
     // ** ONLY FOR TWO TAPES MODE, IF ENABLED **
     cell *second_tape_cell; // Eventually used pointer to tape struct, containing a char array and an int used as position counter
@@ -30,7 +30,7 @@ int main(int argc, char const *argv[])
 
     char c;           // char use to read single chars from files
     FILE *input_file; // opens read only input.txt and instructions.txt
-    FILE *instructions_file;
+    FILE *instructions_file; // file pointer for instructions file
     FILE *config_file = fopen("../settings.conf", "rw"); // Config file, contains information about the configuration of the machine
 
     print_boot();
@@ -102,13 +102,13 @@ int main(int argc, char const *argv[])
                 check_end = 0;      // check used to control the execution of the program. Initialized here and repeated every time before possible execution
                 instructions_n = 0; // resetting the counter
 
-                fill_tape(input_file, main_tape_cell); // Actually praying for this
+                fill_tape(input_file, main_tape_cell); // filling the tape
 
                 while ((c = fgetc(instructions_file)) != EOF) // Instructions counting
                 {                                             // read character by character and check if the end of the file is reached
                     if (c == '\n')
                     {
-                        instructions_n++;
+                        instructions_n++; // if the end of line is reached, another instruction must be counted
                     }
                 }
 
@@ -242,7 +242,7 @@ int main(int argc, char const *argv[])
                                     status = instructions[pos][2];
 
                                 if (instructions[pos][3] == '-')
-                                    main_tape_cell->element = '\0'; // I can understand if it is a machine made space
+                                    main_tape_cell->element = '\0'; // I can understand if it is a machine made space. In this way, i can simplify if statements looking for empty cell by looking for \0 in middle tape or on the right written edge (actual escape char). Middle spaces filled with \0 by the "fill tape" function in tm_tools.c
                                 else
                                     main_tape_cell->element = instructions[pos][3];
 
@@ -301,7 +301,7 @@ int main(int argc, char const *argv[])
                                 (instructions[pos][0] != status || instructions[pos][1] != main_tape_cell->element || instructions[pos][2] != second_tape_cell->element) &&
                                 !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape_cell->element == '\0') && (instructions[pos][2] == second_tape_cell->element || instructions[pos][2] == '-' && (second_tape_cell->element == '\0'))) &&
                                 !(instructions[pos][0] == status && instructions[pos][2] == '-' && (second_tape_cell->element == '\0') && (instructions[pos][1] == main_tape_cell->element || instructions[pos][1] == '-' && (main_tape_cell->element == '\0')))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
-                            {                                                                                                                                                                                                                                     // TODO: Improve this thing pls
+                            {                                                                                                                                                                                                                                     
                                 pos++;
                             }
                             if (pos < instructions_n)

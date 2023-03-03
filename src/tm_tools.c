@@ -46,7 +46,8 @@ void copy_tape(cell *orig, cell *dest)
 cell *get_first_element(cell *c)
 {
     cell *cp;
-    for (cp = c; cp->prev != NULL; cp = (cell *)cp->prev);
+    for (cp = c; cp->prev != NULL; cp = (cell *)cp->prev)
+        ;
     return cp;
 }
 
@@ -57,7 +58,7 @@ void fill_tape(FILE *input_file, cell *c)
     while (fscanf(input_file, "%c", &from_file) != -1)
     {
         if (from_file == ' ')
-            cp->element = 0;
+            cp->element = '\0';
         else
             cp->element = from_file;
 
