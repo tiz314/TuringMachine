@@ -55,7 +55,7 @@ void fill_tape(FILE *input_file, cell *c)
 { // passing the first cell ever allocated, with prev NULL
     char from_file;
     cell *cp = c, *swap_cp;
-    while (fscanf(input_file, "%c", &from_file) != -1)
+    while (fscanf(input_file, "%c", &from_file) != EOF)
     {
         if (from_file == ' ')
             cp->element = '\0';

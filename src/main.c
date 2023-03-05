@@ -389,7 +389,7 @@ int main(int argc, char const *argv[])
                     second_tape_cell = get_first_element(second_tape_cell); // Eventually also for the second tape
 
                 init_tape(main_tape_cell); // clearing the main tape from previous execution. If not, in case of a shorter originale tape, the result would partially remain on the tape and not overwritten!
-                copy_tape(main_tape_backup, main_tape_cell);
+                copy_tape(main_tape_backup, main_tape_cell); // restoring the backup in the main tape
             }
             else
             {
