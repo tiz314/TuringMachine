@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "./headers/consts.h"
 #include "./headers/tm_tools.h" // necessary to find typedef in header file
 
@@ -15,7 +13,7 @@ void init_tape(cell *c)
 { // remember to send the first element with prev as NULL!!
     for (cell *cp = c; cp != NULL; cp = (cell *)cp->next)
     {
-        cp->element = 0;
+        cp->element = '\0';
     }
 }
 

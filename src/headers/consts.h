@@ -1,7 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #define WAIT_TIME 10000
 #define PROMPT "\n~$ > "
 
-#define TAPE_DIM 30
 #define SINGLE_TAPE_RULES_NUMBER 5
 #define TWO_TAPES_RULES_NUMBER 8
 

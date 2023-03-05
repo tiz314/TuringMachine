@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <string.h>
 
 #include "./headers/consts.h"
@@ -7,9 +6,7 @@
 void clear_screen()
 {
 #ifdef __linux__
-
-    printf("\033[2J");
-    printf("\033[0;0f");
+    system("clear");
 #else
     system("cls");
 #endif
@@ -31,7 +28,7 @@ void print_boot()
     printf("                                         |  $$$$$$/                                                                         \n");
     printf("                                          \\______/                                                                          \n");
     printf("==============================================================================================================================\n");
-    // usleep(WAIT_TIME * 100);
+    usleep(WAIT_TIME * 100);
 }
 
 void print_config_error()
