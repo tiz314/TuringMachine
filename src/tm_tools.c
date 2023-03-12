@@ -13,7 +13,7 @@ void init_tape(cell *c)
 { // remember to send the first element with prev as NULL!!
     for (cell *cp = c; cp != NULL; cp = (cell *)cp->next)
     {
-        cp->element = '\0';
+        cp->element = 0;
     }
 }
 
@@ -34,10 +34,11 @@ void copy_tape(cell *orig, cell *dest)
         dp->element = op->element;
         if (dp->next == NULL)
         {
-            dp->next = (struct cell *)calloc(1, sizeof(cell));
+            dp->next = (struct cell *)malloc(sizeof(cell));
         }
         dp = (cell *)dp->next;
         dp->element = 0;
+        dp->next = NULL;
     }
 }
 
@@ -56,7 +57,7 @@ void fill_tape(FILE *input_file, cell *c)
     while (fscanf(input_file, "%c", &from_file) != EOF)
     {
         if (from_file == ' ')
-            cp->element = '\0';
+            cp->element = 0;
         else
             cp->element = from_file;
 

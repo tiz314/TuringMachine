@@ -119,7 +119,7 @@ void print_tape(cell *c, int tape_number)
 
         while (cp != NULL)
         {
-            if (cp->element == '*')
+            if (cp->element == 0)
             {
                 printf("   |  ");
             }

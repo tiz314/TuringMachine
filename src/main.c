@@ -59,6 +59,8 @@ int main(int argc, char const *argv[])
         exec_mode = 0; // Setting the continuous mode as default
     }
 
+    if(m_mode) second_tape_cell = (cell *)calloc(1, sizeof(cell)); // if two tape mode from settings, calloc for the second tape
+
     while (check_menu)
     {
         printf(PROMPT);
@@ -116,7 +118,7 @@ int main(int argc, char const *argv[])
                     rewind(instructions_file); // rewinding file for instructions reading
 
                     instructions = (char **)malloc(instructions_n * sizeof(char *)); // allocating the char arrays array
-                    if (m_mode == 0)
+                    if (!m_mode)
                     {
                         for (i = 0; i < instructions_n; i++)
                         {
@@ -227,7 +229,7 @@ int main(int argc, char const *argv[])
                             while (
                                 (pos < instructions_n) &&
                                 (instructions[pos][0] != status || instructions[pos][1] != main_tape_cell->element) &&
-                                !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape_cell->element == '\0'))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
+                                !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape_cell->element == 0))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
                             {
                                 pos++;
                             }
@@ -240,7 +242,7 @@ int main(int argc, char const *argv[])
                                     status = instructions[pos][2];
 
                                 if (instructions[pos][3] == '-')
-                                    main_tape_cell->element = '\0'; // I can understand if it is a machine made space. In this way, i can simplify if statements looking for empty cell by looking for \0 in middle tape or on the right written edge (actual escape char). Middle spaces filled with \0 by the "fill tape" function in tm_tools.c
+                                    main_tape_cell->element = 0; // I can understand if it is a machine made space. In this way, i can simplify if statements looking for empty cell by looking for \0 in middle tape or on the right written edge (actual escape char). Middle spaces filled with \0 by the "fill tape" function in tm_tools.c
                                 else
                                     main_tape_cell->element = instructions[pos][3];
 
@@ -294,14 +296,16 @@ int main(int argc, char const *argv[])
                         if (!check_end)
                         {
                             pos = 0;
+                            printf("%c %c %c\n", status, main_tape_cell->element, second_tape_cell->element);
                             while (
                                 (pos < instructions_n) &&
                                 (instructions[pos][0] != status || instructions[pos][1] != main_tape_cell->element || instructions[pos][2] != second_tape_cell->element) &&
-                                !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape_cell->element == '\0') && (instructions[pos][2] == second_tape_cell->element || instructions[pos][2] == '-' && (second_tape_cell->element == '\0'))) &&
-                                !(instructions[pos][0] == status && instructions[pos][2] == '-' && (second_tape_cell->element == '\0') && (instructions[pos][1] == main_tape_cell->element || instructions[pos][1] == '-' && (main_tape_cell->element == '\0')))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
+                                !(instructions[pos][0] == status && instructions[pos][1] == '-' && (main_tape_cell->element == 0) && (instructions[pos][2] == second_tape_cell->element || instructions[pos][2] == '-' && (second_tape_cell->element == 0))) &&
+                                !(instructions[pos][0] == status && instructions[pos][2] == '-' && (second_tape_cell->element == 0) && (instructions[pos][1] == main_tape_cell->element || instructions[pos][1] == '-' && (main_tape_cell->element == 0)))) // if looking for - on tape but reaching end of char array or space (human mane (' ') or machine made('*'))
                             {                                                                                                                                                                                                                                     
                                 pos++;
                             }
+                            printf("pos: %d\n", pos);
                             if (pos < instructions_n)
                             {
                                 if (instructions[pos][3] == 'E')
@@ -310,12 +314,12 @@ int main(int argc, char const *argv[])
                                     status = instructions[pos][3];
 
                                 if (instructions[pos][4] == '-')    // Second tape input
-                                    main_tape_cell->element = '\0'; // I can understand if it is a machine made space
+                                    main_tape_cell->element = 0; // I can understand if it is a machine made space
                                 else
                                     main_tape_cell->element = instructions[pos][4];
 
                                 if (instructions[pos][5] == '-')      // Second tape input
-                                    second_tape_cell->element = '\0'; // I can understand if it is a machine made space
+                                    second_tape_cell->element = 0; // I can understand if it is a machine made space
                                 else
                                     second_tape_cell->element = instructions[pos][5];
 
