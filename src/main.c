@@ -296,7 +296,7 @@ int main(int argc, char const *argv[])
                         if (!check_end)
                         {
                             pos = 0;
-                            printf("%c %c %c\n", status, main_tape_cell->element, second_tape_cell->element);
+                            //printf("Read from tapes: %c %c %c\n", status, main_tape_cell->element, second_tape_cell->element);
                             while (
                                 (pos < instructions_n) &&
                                 (instructions[pos][0] != status || instructions[pos][1] != main_tape_cell->element || instructions[pos][2] != second_tape_cell->element) &&
@@ -305,7 +305,7 @@ int main(int argc, char const *argv[])
                             {                                                                                                                                                                                                                                     
                                 pos++;
                             }
-                            printf("pos: %d\n", pos);
+                            //printf("Pos: %d\n", pos);
                             if (pos < instructions_n)
                             {
                                 if (instructions[pos][3] == 'E')
